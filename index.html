@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SANO Solutions — Command Center</title>
+    <meta name="description" content="SANO Solutions internal command center — launch tracker, agent reports, and task management.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">S</div>
+                <div class="logo-text">
+                    <span class="logo-name">SANO</span>
+                    <span class="logo-sub">COMMAND CENTER</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="status-indicator">
+                <div class="status-dot pulse"></div>
+                <span>Systems Online</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="date-display" id="currentDate"></div>
+            <div class="time-display" id="currentTime"></div>
+        </div>
+    </header>
+
+    <!-- Week Timeline Bar -->
+    <section class="week-timeline-bar">
+        <div class="week-timeline" id="weekTimeline"></div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Top Row: Countdown + Progress + Budget -->
+        <section class="top-row top-row-3">
+            <div class="card card-countdown">
+                <div class="card-header">
+                    <h2>🚀 Launch Countdown</h2>
+                    <span class="card-badge">June 1, 2026</span>
+                </div>
+                <div class="countdown-grid">
+                    <div class="countdown-unit">
+                        <span class="countdown-number" id="countDays">--</span>
+                        <span class="countdown-label">DAYS</span>
+                    </div>
+                    <div class="countdown-separator">:</div>
+                    <div class="countdown-unit">
+                        <span class="countdown-number" id="countHours">--</span>
+                        <span class="countdown-label">HOURS</span>
+                    </div>
+                    <div class="countdown-separator">:</div>
+                    <div class="countdown-unit">
+                        <span class="countdown-number" id="countMins">--</span>
+                        <span class="countdown-label">MINS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-progress">
+                <div class="card-header">
+                    <h2>📊 Launch Readiness</h2>
+                    <span class="progress-percent" id="overallPercent">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="overallBar" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <div class="stat">
+                        <span class="stat-number" id="completedTasks">0</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="inProgressTasks">0</span>
+                        <span class="stat-label">In Progress</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="remainingTasks">0</span>
+                        <span class="stat-label">Remaining</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-budget">
+                <div class="card-header">
+                    <h2>💰 Budget Tracker</h2>
+                    <span class="card-badge">$19K Runway</span>
+                </div>
+                <div class="budget-display">
+                    <div class="budget-remaining">
+                        <span class="budget-amount" id="budgetRemaining">$19,000</span>
+                        <span class="budget-label">REMAINING</span>
+                    </div>
+                    <div class="budget-bar-container">
+                        <div class="budget-bar" id="budgetBar" style="width: 100%"></div>
+                    </div>
+                    <div class="budget-stats">
+                        <div class="stat">
+                            <span class="stat-number stat-spent" id="budgetSpent">$0</span>
+                            <span class="stat-label">Spent</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number stat-projected" id="budgetProjected">$0</span>
+                            <span class="stat-label">Projected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Middle Row: Today's Priorities + Agent Activity -->
+        <section class="middle-row">
+            <div class="card card-priorities">
+                <div class="card-header">
+                    <h2>⚡ Today's Priorities</h2>
+                    <span class="card-badge" id="todayDate"></span>
+                </div>
+                <div class="priority-list" id="priorityList"></div>
+            </div>
+
+            <div class="card card-agents">
+                <div class="card-header">
+                    <h2>🤖 Agent Reports</h2>
+                    <span class="card-badge">Overnight Activity</span>
+                </div>
+                <div class="agent-feed" id="agentFeed"></div>
+            </div>
+        </section>
+
+        <!-- Bottom Row: Master Checklist + Right Column -->
+        <section class="bottom-row">
+            <div class="card card-checklist">
+                <div class="card-header">
+                    <h2>📋 Master Build Checklist</h2>
+                    <span class="card-badge">8-Week Plan → June 1</span>
+                </div>
+                <div class="checklist-sections" id="checklistSections"></div>
+            </div>
+
+            <div class="right-column">
+                <!-- Approval Queue -->
+                <div class="card card-approvals">
+                    <div class="card-header">
+                        <h2>✅ Needs Your Approval</h2>
+                        <span class="approval-count" id="approvalCount">0</span>
+                    </div>
+                    <div class="approval-list" id="approvalList"></div>
+                </div>
+
+                <!-- CEO Comments / Notes -->
+                <div class="card card-comments">
+                    <div class="card-header">
+                        <h2>💬 Your Notes & Decisions</h2>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <span class="comment-count" id="commentCount">0</span>
+                            <button class="btn btn-copy" onclick="copyAllComments()" title="Copy all comments to clipboard">📋 Copy All</button>
+                        </div>
+                    </div>
+                    <div class="comment-feed" id="commentFeed"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Comment Modal -->
+    <div class="comment-modal" id="commentModal">
+        <div class="comment-modal-content">
+            <div class="comment-modal-header">
+                <h3>💬 Leave a Note</h3>
+                <button class="modal-close" onclick="closeComment()">✕</button>
+            </div>
+            <div class="comment-modal-target">
+                Re: <strong id="commentTarget"></strong>
+            </div>
+            <textarea id="commentInput" class="comment-textarea" placeholder="Type your feedback, questions, or instructions here..." rows="4"></textarea>
+            <div class="comment-modal-actions">
+                <button class="btn btn-approve" onclick="submitComment()">💬 Save Comment</button>
+                <button class="btn btn-reject" onclick="closeComment()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Bar -->
+    <nav class="quick-actions">
+        <button class="action-btn" onclick="refreshDashboard()">
+            <span class="action-icon">🔄</span><span>Refresh</span>
+        </button>
+        <button class="action-btn" onclick="toggleSection('agents')">
+            <span class="action-icon">🤖</span><span>Agents</span>
+        </button>
+        <button class="action-btn" onclick="toggleSection('checklist')">
+            <span class="action-icon">📋</span><span>Checklist</span>
+        </button>
+        <button class="action-btn" onclick="copyAllComments()">
+            <span class="action-icon">📤</span><span>Export Notes</span>
+        </button>
+    </nav>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
