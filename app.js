@@ -1,8 +1,11 @@
 /* ============================================
-   SANO COMMAND CENTER — Application Logic v2.0
-   Features: Comments, Active Approvals, Export,
-   Persistence, Week Timeline
+   SANO COMMAND CENTER — Application Logic v3.0
+   Features: Comments, Approvals, Export,
+   Persistence, Expandable Priorities, Week Timeline
    ============================================ */
+
+// Data version — bump this when data.js changes to invalidate stale localStorage
+const DATA_VERSION = '2026-04-06-v3';
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedData();
@@ -203,8 +206,8 @@ function renderAgentFeed() {
                 <span class="agent-time">${r.time}</span>
             </div>
             <div class="agent-message">${r.message}</div>
-            ${r.file ? `<a class="agent-file-link" href="#">📄 ${r.file}</a>` : ''}
-            <button class="comment-btn-sm" onclick="openComment('agent-report', '${r.agent} report')" title="Leave feedback">💬 Comment</button>
+            ${r.file ? `<span class="agent-file-link">📄 ${r.file}</span>` : ''}
+            <button class="comment-btn-sm" onclick="openComment('agent-report', '${r.agent} report')" title="Leave feedback">💬</button>
         </div>`;
     }).join('');
 }
@@ -500,8 +503,19 @@ function toggleSection(section) {
     }
 }
 
-// Clear stale QA data on first load if needed
+// Clear stale data on first load if needed
 function resetToDefaultData() {
     localStorage.removeItem(STORAGE_KEY);
     location.reload();
+}
+
+// Export comments as formatted text
+function exportComments() {
+    if (!SANO_DATA.comments || !SANO_DATA.comments.length) {
+        return 'No comments yet.';
+    }
+    return SANO_DATA.comments.map(c => {
+        const prefix = c.type === 'decision' ? '⚖️ DECISION' : '💬 NOTE';
+        return `${prefix} | ${c.target}\n${c.text}\n(${c.timestamp})\n`;
+    }).join('\n---\n\n');
 }

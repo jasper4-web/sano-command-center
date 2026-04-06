@@ -381,6 +381,7 @@ const STORAGE_KEY = 'sano_command_center';
 function saveData() {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            _dataVersion: typeof DATA_VERSION !== 'undefined' ? DATA_VERSION : '',
             priorities: SANO_DATA.priorities,
             approvals: SANO_DATA.approvals,
             comments: SANO_DATA.comments,
@@ -398,7 +399,23 @@ function loadSavedData() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             const parsed = JSON.parse(saved);
-            // Merge saved state back into SANO_DATA
+
+            // VERSION CHECK: If data.js was updated (version bumped), 
+            // discard stale priorities/checklist but keep user comments
+            const savedVersion = parsed._dataVersion || '';
+            const currentVersion = typeof DATA_VERSION !== 'undefined' ? DATA_VERSION : '';
+
+            if (savedVersion !== currentVersion) {
+                console.log('📦 Data version changed — loading fresh priorities & checklist');
+                // Only restore user-generated data (comments, approvals)
+                if (parsed.comments) SANO_DATA.comments = parsed.comments;
+                // Don't restore priorities or checklist — use fresh data.js values
+                // Save the new version
+                saveData();
+                return;
+            }
+
+            // Same version — safe to restore everything
             if (parsed.priorities) SANO_DATA.priorities = parsed.priorities;
             if (parsed.approvals) SANO_DATA.approvals = parsed.approvals;
             if (parsed.comments) SANO_DATA.comments = parsed.comments;
@@ -420,12 +437,4 @@ function loadSavedData() {
     } catch (e) {
         console.warn('Failed to load saved data:', e);
     }
-}
-
-// Export comments to clipboard-ready format
-function exportComments() {
-    if (SANO_DATA.comments.length === 0) return 'No comments yet.';
-    return SANO_DATA.comments.map(c =>
-        `[${c.timestamp}] Re: ${c.target}\n${c.text}\n---`
-    ).join('\n');
 }
