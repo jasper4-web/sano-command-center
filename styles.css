@@ -1302,7 +1302,7 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
-/* --- Responsive --- */
+/* --- Responsive (Mobile-First for iPhone Safari) --- */
 @media (max-width: 1024px) {
     .top-row, .top-row-3, .middle-row, .bottom-row {
         grid-template-columns: 1fr;
@@ -1310,30 +1310,162 @@ body {
     .countdown-number {
         font-size: 2.5rem;
     }
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+    }
 }
 
 @media (max-width: 640px) {
+    /* Base layout */
+    html { font-size: 15px; }
+
     .main {
         padding: var(--space-md);
+        gap: var(--space-md);
     }
+
+    /* Header — compact for mobile */
     .header {
+        padding: var(--space-sm) var(--space-md);
+        gap: var(--space-xs);
+    }
+    .header-left { flex: 1; }
+    .header-center { display: none; } /* Hide "Systems Online" on mobile — saves space */
+    .header-right { text-align: right; }
+    .logo-icon { width: 34px; height: 34px; font-size: 1rem; }
+    .logo-name { font-size: 1rem; letter-spacing: 2px; }
+    .logo-sub { font-size: 0.55rem; letter-spacing: 2px; }
+    .date-display { font-size: 0.7rem; }
+    .time-display { font-size: 0.9rem; }
+
+    /* Week timeline — horizontal scroll on mobile */
+    .week-timeline-bar {
+        padding: var(--space-sm) var(--space-md);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .week-timeline {
+        min-width: max-content;
+    }
+    .week-block {
+        min-width: 80px;
+        padding: var(--space-sm) !important;
+    }
+    .week-num { font-size: 0.6rem; }
+    .week-name { font-size: 0.65rem; }
+    .week-dates { font-size: 0.55rem; }
+
+    /* Cards — tighter padding */
+    .card {
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+    }
+    .card-header {
+        margin-bottom: var(--space-md);
         flex-wrap: wrap;
         gap: var(--space-sm);
     }
-    .header-center {
-        order: 3;
-        width: 100%;
-        justify-content: center;
+    .card-header h2 { font-size: 0.9rem; }
+
+    /* Countdown — compact */
+    .countdown-grid {
+        padding: var(--space-md) 0;
+        gap: var(--space-md);
     }
-    .week-timeline-bar {
-        padding: var(--space-sm);
+    .countdown-number { font-size: 2.2rem; }
+    .countdown-label { font-size: 0.6rem; letter-spacing: 2px; }
+    .countdown-separator { font-size: 1.8rem; }
+
+    /* Progress */
+    .progress-percent { font-size: 1.4rem; }
+    .progress-stats { gap: var(--space-lg); }
+    .stat-number { font-size: 1.1rem; }
+
+    /* Budget */
+    .budget-amount { font-size: 1.8rem; }
+    .budget-stats { gap: var(--space-md); }
+
+    /* Priorities — touch-friendly */
+    .priority-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
     }
-    /* Mobile: always show comment buttons */
+    .priority-row {
+        padding: var(--space-md) var(--space-sm);
+        gap: var(--space-sm);
+        min-height: 48px; /* iOS touch target */
+    }
+    .priority-text { font-size: 0.85rem; }
+    .priority-time { font-size: 0.6rem; }
+    .priority-tag { font-size: 0.6rem; padding: 2px 6px; }
+    .priority-expand { font-size: 0.7rem; }
+
+    /* Steps — readable on small screens */
+    .priority-steps.open {
+        padding: 0 var(--space-sm) var(--space-sm);
+    }
+    .steps-inner { padding: var(--space-sm); }
+    .step-item { font-size: 0.78rem; }
+    .step-num { width: 20px; height: 20px; font-size: 0.6rem; }
+
+    /* Agent feed */
+    .agent-feed { max-height: 300px; }
+    .agent-name { font-size: 0.8rem; }
+    .agent-time { font-size: 0.65rem; }
+    .agent-message { font-size: 0.8rem; }
+
+    /* Checklist */
+    .checklist-section-header { padding: var(--space-sm) var(--space-md); }
+    .checklist-section-title { font-size: 0.82rem; }
+    .checklist-items { padding: 0 var(--space-sm) var(--space-sm); }
+    .checklist-item { font-size: 0.78rem; padding: 6px var(--space-xs); min-height: 40px; }
+    .mini-progress-bar { width: 50px; }
+
+    /* Comment buttons — always visible on mobile (no hover) */
     .comment-btn-sm {
         opacity: 0.5 !important;
-        font-size: 0.85rem;
-        padding: 6px 10px;
+        font-size: 0.8rem;
+        padding: 6px 8px;
     }
+
+    /* Approval items */
+    .approval-title { font-size: 0.82rem; }
+    .approval-desc { font-size: 0.78rem; }
+    .approval-actions { flex-wrap: wrap; }
+
+    /* Comment modal — full width on mobile */
+    .comment-modal-content {
+        width: 95%;
+        padding: var(--space-lg);
+    }
+    .comment-textarea { font-size: 16px; } /* Prevents iOS zoom on focus */
+
+    /* Bottom Quick Actions — fixed, thumb-friendly */
+    .quick-actions {
+        padding: var(--space-sm) var(--space-md);
+        gap: var(--space-xs);
+    }
+    .action-btn {
+        padding: var(--space-sm);
+        font-size: 0.7rem;
+    }
+    .action-btn span:last-child {
+        display: none; /* Hide text labels on mobile, show icons only */
+    }
+    .action-icon { font-size: 1.1rem; }
+
+    /* Toast — above bottom nav */
+    .toast {
+        bottom: 70px;
+        font-size: 0.75rem;
+    }
+
+    /* Ambient effects — lighter on mobile for performance */
+    .ambient-glow { opacity: 0.15; }
+    .grid-overlay { display: none; }
 }
 
 /* --- Section Highlight Flash (Nav bar buttons) --- */
