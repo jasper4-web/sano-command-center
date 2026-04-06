@@ -1,11 +1,9 @@
 /* ============================================
-   SANO COMMAND CENTER — Application Logic v3.0
-   Features: Comments, Approvals, Export,
-   Persistence, Expandable Priorities, Week Timeline
+   SANO COMMAND CENTER — v5.0
+   Mission Control Logic
    ============================================ */
 
-// Data version — bump this when data.js changes to invalidate stale localStorage
-const DATA_VERSION = '2026-04-06-v3';
+const DATA_VERSION = '2026-04-06-v5';
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedData();
@@ -37,11 +35,9 @@ function updateClock() {
 function updateDateDisplay() {
     const now = new Date();
     const dateEl = document.getElementById('currentDate');
-    const todayEl = document.getElementById('todayDate');
     if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', {
         weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
     });
-    if (todayEl) todayEl.textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 /* --- Countdown --- */
@@ -50,9 +46,9 @@ function initCountdown() { updateCountdown(); }
 function updateCountdown() {
     const diff = SANO_DATA.launchDate - new Date();
     if (diff <= 0) {
-        document.getElementById('countDays').textContent = '🚀';
-        document.getElementById('countHours').textContent = 'LIVE';
-        document.getElementById('countMins').textContent = '!';
+        setText('countDays', '00');
+        setText('countHours', '00');
+        setText('countMins', '00');
         return;
     }
     const d = Math.floor(diff / 864e5);
@@ -61,6 +57,12 @@ function updateCountdown() {
     setText('countDays', String(d).padStart(2, '0'));
     setText('countHours', String(h).padStart(2, '0'));
     setText('countMins', String(m).padStart(2, '0'));
+
+    // Update current week label
+    const activeWeek = SANO_DATA.weeks.find(w => w.status === 'active');
+    if (activeWeek) {
+        setText('currentWeekLabel', `W${activeWeek.num} — ${activeWeek.name}`);
+    }
 }
 
 /* --- Week Timeline --- */
@@ -68,7 +70,7 @@ function renderWeekTimeline() {
     const container = document.getElementById('weekTimeline');
     if (!container) return;
     container.innerHTML = SANO_DATA.weeks.map((w, i) => `
-        <div class="week-block ${w.status}" title="${w.theme}" onclick="scrollToWeek(${i})" style="cursor:pointer">
+        <div class="week-block ${w.status}" title="${w.theme}" onclick="scrollToSection('sectionChecklist')" style="cursor:pointer">
             <span class="week-num">W${w.num}</span>
             <span class="week-name">${w.name}</span>
             <span class="week-dates">${w.dates}</span>
@@ -76,29 +78,11 @@ function renderWeekTimeline() {
     `).join('');
 }
 
-function scrollToWeek(weekIndex) {
-    // Scroll to the checklist section and highlight the matching week
-    const checklistCard = document.querySelector('.card-checklist');
-    if (checklistCard) {
-        checklistCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Open the relevant checklist section if it maps to one
-        const sections = document.querySelectorAll('.checklist-items');
-        // Try to find a section by its week range
-        setTimeout(() => {
-            const sectionEl = document.getElementById(`checklist-${Math.min(weekIndex, sections.length - 1)}`);
-            if (sectionEl && !sectionEl.classList.contains('open')) {
-                sectionEl.classList.add('open');
-            }
-        }, 500);
-    }
-}
-
-/* --- Priorities (Expandable with Action Plans) --- */
+/* --- Priorities --- */
 function renderPriorities() {
     const container = document.getElementById('priorityList');
     if (!container) return;
 
-    // Calculate total estimated time for undone items
     const activePriorities = SANO_DATA.priorities.filter(p => !p.done);
     const totalMinutes = activePriorities.reduce((sum, p) => {
         const match = p.timeEstimate?.match(/(\d+)/);
@@ -106,21 +90,15 @@ function renderPriorities() {
     }, 0);
     const hours = Math.floor(totalMinutes / 60);
     const mins = totalMinutes % 60;
-    const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+    const timeStr = hours > 0 ? `~${hours}h ${mins}m` : `~${mins}m`;
 
-    // Add time estimate header
     const timeHeader = document.getElementById('priorityTimeEstimate');
-    if (timeHeader) {
-        timeHeader.textContent = activePriorities.length > 0
-            ? `~${timeStr} estimated`
-            : 'All clear!';
-    }
+    if (timeHeader) timeHeader.textContent = activePriorities.length > 0 ? timeStr : 'Clear';
 
-    // Updated timestamp
     const updatedEl = document.getElementById('priorityUpdated');
     if (updatedEl && SANO_DATA.prioritiesLastUpdated) {
         const d = new Date(SANO_DATA.prioritiesLastUpdated);
-        updatedEl.textContent = `Updated: ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+        updatedEl.textContent = `Updated ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
     }
 
     container.innerHTML = SANO_DATA.priorities.map((p, i) => {
@@ -169,18 +147,10 @@ function togglePriority(i) {
 function expandPriority(i) {
     const p = SANO_DATA.priorities[i];
     if (p.done || !p.steps || p.steps.length === 0) return;
-
     const el = document.getElementById(`steps-${i}`);
     if (!el) return;
-
-    // Close all other open steps
-    document.querySelectorAll('.priority-steps.open').forEach(s => {
-        if (s !== el) s.classList.remove('open');
-    });
-    document.querySelectorAll('.priority-expand.rotated').forEach(e => {
-        e.classList.remove('rotated');
-    });
-
+    document.querySelectorAll('.priority-steps.open').forEach(s => { if (s !== el) s.classList.remove('open'); });
+    document.querySelectorAll('.priority-expand.rotated').forEach(e => e.classList.remove('rotated'));
     el.classList.toggle('open');
     const expandIcon = el.closest('.priority-item')?.querySelector('.priority-expand');
     if (expandIcon) expandIcon.classList.toggle('rotated');
@@ -191,7 +161,7 @@ function renderAgentFeed() {
     const container = document.getElementById('agentFeed');
     if (!container) return;
     if (!SANO_DATA.agentReports.length) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">—</span>No agent activity yet.</div>';
+        container.innerHTML = '<div class="empty-state">No agent activity yet.</div>';
         return;
     }
     container.innerHTML = SANO_DATA.agentReports.map(r => {
@@ -232,7 +202,7 @@ function renderChecklist() {
         return `
             <div class="checklist-section">
                 <div class="checklist-section-header" onclick="toggleChecklist(${si})">
-                    <div style="display:flex;align-items:center;gap:8px">
+                    <div style="display:flex;align-items:center;gap:6px">
                         <span class="checklist-section-title">${section.section}</span>
                         <span class="week-tag">${section.week}</span>
                     </div>
@@ -246,28 +216,25 @@ function renderChecklist() {
     }).join('');
 }
 
-function toggleChecklist(i) {
-    document.getElementById(`checklist-${i}`)?.classList.toggle('open');
-}
+function toggleChecklist(i) { document.getElementById(`checklist-${i}`)?.classList.toggle('open'); }
 
 function cycleStatus(si, ii) {
     const item = SANO_DATA.checklist[si].items[ii];
     const order = ['not-started', 'in-progress', 'done'];
-    const next = order[(order.indexOf(item.status) + 1) % 3];
-    item.status = next;
+    item.status = order[(order.indexOf(item.status) + 1) % 3];
     renderChecklist();
     updateProgressStats();
     saveData();
 }
 
-/* --- Approvals (ACTIVE) --- */
+/* --- Approvals --- */
 function renderApprovals() {
     const container = document.getElementById('approvalList');
     const countEl = document.getElementById('approvalCount');
     if (!container) return;
     if (countEl) countEl.textContent = SANO_DATA.approvals.length;
     if (!SANO_DATA.approvals.length) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">—</span>All caught up.</div>';
+        container.innerHTML = '<div class="empty-state">All caught up.</div>';
         return;
     }
     container.innerHTML = SANO_DATA.approvals.map((a, i) => `
@@ -275,9 +242,9 @@ function renderApprovals() {
             <div class="approval-title">${a.title}</div>
             <div class="approval-desc">${a.description}</div>
             <div class="approval-actions">
-                <button class="btn btn-approve" onclick="handleApproval(${i}, 'approved')">Approve</button>
-                <button class="btn btn-review" onclick="openComment('approval', '${a.title.replace(/'/g, "\\'")}')">Comment</button>
-                <button class="btn btn-reject" onclick="handleApproval(${i}, 'rejected')">Reject</button>
+                <button class="btn-approve" onclick="handleApproval(${i}, 'approved')">Approve</button>
+                <button class="btn-review" onclick="openComment('approval', '${a.title.replace(/'/g, "\\'")}')">Comment</button>
+                <button class="btn-reject" onclick="handleApproval(${i}, 'rejected')">Reject</button>
             </div>
         </div>`).join('');
 }
@@ -285,16 +252,6 @@ function renderApprovals() {
 function handleApproval(index, decision) {
     const item = SANO_DATA.approvals[index];
     const el = document.getElementById(`approval-${index}`);
-
-    // Record the decision
-    const record = {
-        title: item.title,
-        decision: decision,
-        timestamp: new Date().toISOString(),
-        file: item.file
-    };
-
-    // Save to comments as a decision record
     SANO_DATA.comments.push({
         id: `decision-${Date.now()}`,
         target: item.title,
@@ -302,20 +259,13 @@ function handleApproval(index, decision) {
         timestamp: new Date().toLocaleString(),
         type: 'decision'
     });
-
-    // Visual feedback
-    if (el) {
-        el.style.borderLeftColor = decision === 'approved' ? 'var(--accent-green)' : 'var(--accent-red)';
-        el.style.opacity = '0.4';
-        el.querySelector('.approval-title').textContent += ` — ${decision.toUpperCase()}`;
-    }
-
+    if (el) { el.style.opacity = '0.3'; }
     setTimeout(() => {
         SANO_DATA.approvals.splice(index, 1);
         renderApprovals();
         renderComments();
         saveData();
-    }, 800);
+    }, 600);
 }
 
 /* --- Comment System --- */
@@ -324,51 +274,35 @@ function openComment(type, target) {
     const input = document.getElementById('commentInput');
     const label = document.getElementById('commentTarget');
     if (!modal) return;
-
     label.textContent = target;
     modal.dataset.type = type;
     modal.dataset.target = target;
     input.value = '';
     modal.classList.add('open');
     input.focus();
-
-    // Keyboard support
-    const keyHandler = function(e) {
-        if (e.key === 'Escape') {
-            closeComment();
-            document.removeEventListener('keydown', keyHandler);
-        }
-        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-            submitComment();
-            document.removeEventListener('keydown', keyHandler);
-        }
+    const keyHandler = (e) => {
+        if (e.key === 'Escape') { closeComment(); document.removeEventListener('keydown', keyHandler); }
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { submitComment(); document.removeEventListener('keydown', keyHandler); }
     };
     document.addEventListener('keydown', keyHandler);
 }
 
-function closeComment() {
-    document.getElementById('commentModal')?.classList.remove('open');
-}
+function closeComment() { document.getElementById('commentModal')?.classList.remove('open'); }
 
 function submitComment() {
     const modal = document.getElementById('commentModal');
     const input = document.getElementById('commentInput');
     if (!input.value.trim()) return;
-
-    const comment = {
+    SANO_DATA.comments.unshift({
         id: `comment-${Date.now()}`,
         target: modal.dataset.target,
         type: modal.dataset.type,
         text: input.value.trim(),
         timestamp: new Date().toLocaleString(),
-    };
-
-    SANO_DATA.comments.unshift(comment);
+    });
     closeComment();
     renderComments();
     saveData();
-
-    // Show confirmation
     showToast(`Note saved: "${modal.dataset.target}"`);
 }
 
@@ -377,19 +311,17 @@ function renderComments() {
     const countEl = document.getElementById('commentCount');
     if (!container) return;
     if (countEl) countEl.textContent = SANO_DATA.comments.length;
-
     if (!SANO_DATA.comments.length) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">—</span>No notes yet.</div>';
+        container.innerHTML = '<div class="empty-state">No notes yet.</div>';
         return;
     }
-
     container.innerHTML = SANO_DATA.comments.slice(0, 20).map(c => {
-        const icon = c.type === 'decision' ? 'DECISION' : 'NOTE';
+        const label = c.type === 'decision' ? 'DECISION' : 'NOTE';
         const cls = c.type === 'decision' ? 'comment-decision' : '';
         return `
         <div class="comment-item ${cls}">
             <div class="comment-header">
-                <span>${icon} <strong>${c.target}</strong></span>
+                <span>${label} — <strong>${c.target}</strong></span>
                 <span class="comment-time">${c.timestamp}</span>
             </div>
             <div class="comment-text">${c.text}</div>
@@ -400,16 +332,15 @@ function renderComments() {
 function copyAllComments() {
     const text = exportComments();
     navigator.clipboard.writeText(text).then(() => {
-        showToast('Comments copied to clipboard!');
+        showToast('Notes copied to clipboard');
     }).catch(() => {
-        // Fallback
         const ta = document.createElement('textarea');
         ta.value = text;
         document.body.appendChild(ta);
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        showToast('Comments copied!');
+        showToast('Notes copied');
     });
 }
 
@@ -429,10 +360,10 @@ function updateProgressStats() {
     setTimeout(() => {
         const bar = document.getElementById('overallBar');
         if (bar) bar.style.width = `${pct}%`;
-    }, 300);
+    }, 200);
 }
 
-/* --- Budget Tracker --- */
+/* --- Budget Tracker (Redesigned) --- */
 function renderBudget() {
     const budget = SANO_DATA.budget;
     if (!budget) return;
@@ -442,80 +373,69 @@ function renderBudget() {
         .reduce((sum, e) => sum + e.amount, 0);
 
     const projected = budget.expenses
-        .filter(e => e.status === 'pending')
         .reduce((sum, e) => sum + e.amount, 0);
 
     const remaining = budget.starting - spent;
     const pctRemaining = Math.round((remaining / budget.starting) * 100);
 
-    // Update display
+    // Burn rate: projected total / 8 weeks
+    const burnRate = Math.round(projected / 8);
+    // Runway: remaining / weekly burn rate
+    const runwayWeeks = burnRate > 0 ? Math.round(remaining / burnRate) : 0;
+
+    // Display
     const amountEl = document.getElementById('budgetRemaining');
     if (amountEl) {
         amountEl.textContent = `$${remaining.toLocaleString()}`;
-        amountEl.className = 'budget-amount';
+        amountEl.className = 'health-value budget-remaining-val';
         if (pctRemaining < 25) amountEl.classList.add('danger');
         else if (pctRemaining < 50) amountEl.classList.add('caution');
     }
 
+    // Bar color
+    const barEl = document.getElementById('budgetBar');
+    if (barEl) {
+        barEl.className = 'health-bar-fill budget-bar-fill';
+        if (pctRemaining < 25) barEl.classList.add('danger');
+        else if (pctRemaining < 50) barEl.classList.add('caution');
+        setTimeout(() => { barEl.style.width = `${pctRemaining}%`; }, 200);
+    }
+
     setText('budgetSpent', `$${spent.toLocaleString()}`);
     setText('budgetProjected', `$${projected.toLocaleString()}`);
-
-    setTimeout(() => {
-        const bar = document.getElementById('budgetBar');
-        if (bar) bar.style.width = `${pctRemaining}%`;
-    }, 300);
+    setText('budgetBurn', `$${burnRate.toLocaleString()}/wk`);
+    setText('budgetRunway', runwayWeeks > 0 ? `${runwayWeeks} wks` : '—');
 }
 
-/* --- Toast Notifications --- */
+/* --- Toast --- */
 function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.textContent = message;
     document.body.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
 }
 
-/* --- Utility --- */
-function setText(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-}
-
+/* --- Utilities --- */
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
 function refreshDashboard() { location.reload(); }
 
-function toggleSection(section) {
-    // Scroll to and highlight the relevant section
-    const sectionMap = {
-        'agents': '.card-agents',
-        'checklist': '.card-checklist',
-        'approvals': '.card-approvals',
-        'comments': '.card-comments'
-    };
-    const target = document.querySelector(sectionMap[section]);
-    if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        target.classList.add('section-highlight');
-        setTimeout(() => target.classList.remove('section-highlight'), 2000);
+function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.classList.add('section-highlight');
+        setTimeout(() => el.classList.remove('section-highlight'), 1500);
     }
 }
 
-// Clear stale data on first load if needed
-function resetToDefaultData() {
-    localStorage.removeItem(STORAGE_KEY);
-    location.reload();
-}
+function resetToDefaultData() { localStorage.removeItem(STORAGE_KEY); location.reload(); }
 
-// Export comments as formatted text
 function exportComments() {
-    if (!SANO_DATA.comments || !SANO_DATA.comments.length) {
-        return 'No comments yet.';
-    }
+    if (!SANO_DATA.comments || !SANO_DATA.comments.length) return 'No notes yet.';
     return SANO_DATA.comments.map(c => {
-        const prefix = c.type === 'decision' ? '⚖️ DECISION' : '💬 NOTE';
+        const prefix = c.type === 'decision' ? 'DECISION' : 'NOTE';
         return `${prefix} | ${c.target}\n${c.text}\n(${c.timestamp})\n`;
     }).join('\n---\n\n');
 }
