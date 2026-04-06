@@ -6,7 +6,7 @@
     <title>SANO Solutions — Command Center</title>
     <meta name="description" content="SANO Solutions internal command center — launch tracker, agent reports, and task management.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -48,7 +48,7 @@
         <section class="top-row top-row-3">
             <div class="card card-countdown">
                 <div class="card-header">
-                    <h2>🚀 Launch Countdown</h2>
+                    <h2>Launch Countdown</h2>
                     <span class="card-badge">June 1, 2026</span>
                 </div>
                 <div class="countdown-grid">
@@ -71,7 +71,7 @@
 
             <div class="card card-progress">
                 <div class="card-header">
-                    <h2>📊 Launch Readiness</h2>
+                    <h2>Launch Readiness</h2>
                     <span class="progress-percent" id="overallPercent">0%</span>
                 </div>
                 <div class="progress-bar-container">
@@ -95,7 +95,7 @@
 
             <div class="card card-budget">
                 <div class="card-header">
-                    <h2>💰 Budget Tracker</h2>
+                    <h2>Budget Tracker</h2>
                     <span class="card-badge">$19K Runway</span>
                 </div>
                 <div class="budget-display">
@@ -124,7 +124,7 @@
         <section class="middle-row">
             <div class="card card-priorities">
                 <div class="card-header">
-                    <h2>⚡ Today's Priorities</h2>
+                    <h2>Today's Priorities</h2>
                     <div class="priority-meta">
                         <span class="priority-time-total" id="priorityTimeEstimate"></span>
                         <span class="priority-updated" id="priorityUpdated"></span>
@@ -135,7 +135,7 @@
 
             <div class="card card-agents">
                 <div class="card-header">
-                    <h2>🤖 Agent Reports</h2>
+                    <h2>Agent Reports</h2>
                     <span class="card-badge">Overnight Activity</span>
                 </div>
                 <div class="agent-feed" id="agentFeed"></div>
@@ -146,7 +146,7 @@
         <section class="bottom-row">
             <div class="card card-checklist">
                 <div class="card-header">
-                    <h2>📋 Master Build Checklist</h2>
+                    <h2>Master Build Checklist</h2>
                     <span class="card-badge">8-Week Plan → June 1</span>
                 </div>
                 <div class="checklist-sections" id="checklistSections"></div>
@@ -156,7 +156,7 @@
                 <!-- Approval Queue -->
                 <div class="card card-approvals">
                     <div class="card-header">
-                        <h2>✅ Needs Your Approval</h2>
+                        <h2>Needs Your Approval</h2>
                         <span class="approval-count" id="approvalCount">0</span>
                     </div>
                     <div class="approval-list" id="approvalList"></div>
@@ -165,10 +165,10 @@
                 <!-- CEO Comments / Notes -->
                 <div class="card card-comments">
                     <div class="card-header">
-                        <h2>💬 Your Notes & Decisions</h2>
+                        <h2>Notes & Decisions</h2>
                         <div style="display:flex;gap:8px;align-items:center">
                             <span class="comment-count" id="commentCount">0</span>
-                            <button class="btn btn-copy" onclick="copyAllComments()" title="Copy all comments to clipboard">📋 Copy All</button>
+                            <button class="btn btn-copy" onclick="copyAllComments()" title="Copy all comments to clipboard">Copy All</button>
                         </div>
                     </div>
                     <div class="comment-feed" id="commentFeed"></div>
@@ -181,7 +181,7 @@
     <div class="comment-modal" id="commentModal">
         <div class="comment-modal-content">
             <div class="comment-modal-header">
-                <h3>💬 Leave a Note</h3>
+                <h3>Leave a Note</h3>
                 <button class="modal-close" onclick="closeComment()">✕</button>
             </div>
             <div class="comment-modal-target">
@@ -189,7 +189,7 @@
             </div>
             <textarea id="commentInput" class="comment-textarea" placeholder="Type your feedback, questions, or instructions here..." rows="4"></textarea>
             <div class="comment-modal-actions">
-                <button class="btn btn-approve" onclick="submitComment()">💬 Save Comment</button>
+                <button class="btn btn-approve" onclick="submitComment()">Save Note</button>
                 <button class="btn btn-reject" onclick="closeComment()">Cancel</button>
             </div>
         </div>
@@ -198,16 +198,16 @@
     <!-- Quick Actions Bar -->
     <nav class="quick-actions">
         <button class="action-btn" onclick="refreshDashboard()">
-            <span class="action-icon">🔄</span><span>Refresh</span>
+            <span class="action-icon">↻</span><span>Refresh</span>
         </button>
         <button class="action-btn" onclick="toggleSection('agents')">
-            <span class="action-icon">🤖</span><span>Agents</span>
+            <span class="action-icon">◎</span><span>Agents</span>
         </button>
         <button class="action-btn" onclick="toggleSection('checklist')">
-            <span class="action-icon">📋</span><span>Checklist</span>
+            <span class="action-icon">☰</span><span>Checklist</span>
         </button>
         <button class="action-btn" onclick="copyAllComments()">
-            <span class="action-icon">📤</span><span>Export Notes</span>
+            <span class="action-icon">↗</span><span>Export</span>
         </button>
     </nav>
 

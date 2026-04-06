@@ -139,28 +139,28 @@ const SANO_DATA = {
     // ---- Agent Overnight Reports ----
     agentReports: [
         {
-            agent: '⚙️ Overseer',
+            agent: 'Overseer',
             time: '10:08 PM — Apr 5',
             message: 'Pipeline Mode activated. 7 brain files deployed (SOUL, IDENTITY, BOOTSTRAP, USER, HEARTBEAT, TOOLS, AGENTS). Hierarchical delegation pattern live. QA gate via Agent Zero enabled.',
             file: null,
             status: 'complete'
         },
         {
-            agent: '🔍 Scout',
+            agent: 'Scout',
             time: '10:16 PM — Apr 4',
             message: 'Completed Houston lead scrape: 39 leads across 3 verticals (Plumbing, HVAC, Auto Repair). Top prospect: Auto Best Houston Inc (Score 7/10 — no website, 127 reviews). Full hot list ready for Chris.',
             file: 'agents/scout/master-lead-list.md',
             status: 'complete'
         },
         {
-            agent: '📚 Professor',
+            agent: 'Professor',
             time: '10:22 PM — Apr 4',
             message: 'Completed Chris Sales Training Packet — 1,163 lines, 10 sections + 5 appendices. Includes word-for-word pitches, objection scripts, demo guide, commission calculator, and Houston market intel.',
             file: 'agents/professor/chris-training-packet-full.md',
             status: 'complete'
         },
         {
-            agent: '📊 Analyst',
+            agent: 'Analyst',
             time: '12:02 PM — Apr 5',
             message: 'Financial model re-launched. Building 3-scenario projection (Conservative / Moderate / Aggressive) with cash flow through Month 12.',
             file: null,
@@ -172,7 +172,7 @@ const SANO_DATA = {
     // Pulled directly from 09-final-execution-plan.md & 15-8-week-overview.md
     checklist: [
         {
-            section: '📦 Pricing & Packages',
+            section: 'Pricing & Packages',
             week: 'Pre-launch',
             items: [
                 { id: 'pkg-1', text: '4-tier pricing structure defined', status: 'done' },
@@ -186,7 +186,7 @@ const SANO_DATA = {
             ]
         },
         {
-            section: '🤖 Agent & Automation Infrastructure',
+            section: 'Agent & Automation Infrastructure',
             week: 'Week 0-1',
             items: [
                 { id: 'agent-1', text: 'OpenClaw agent installed on Mac Mini', status: 'done' },
@@ -202,7 +202,7 @@ const SANO_DATA = {
             ]
         },
         {
-            section: '📧 Cold Email System (Instantly.ai)',
+            section: 'Cold Email System (Instantly.ai)',
             week: 'Week 0-1',
             items: [
                 { id: 'email-1', text: 'Sign up for Instantly.ai ($47/mo Growth plan)', status: 'not-started' },
@@ -214,11 +214,11 @@ const SANO_DATA = {
                 { id: 'email-7', text: 'Build lead list: 500+ Houston service businesses', status: 'in-progress' },
                 { id: 'email-8', text: 'Import lead list into Instantly', status: 'not-started' },
                 { id: 'email-9', text: 'Launch test sends (50-100 emails)', status: 'not-started' },
-                { id: 'email-10', text: '🚀 Full campaign launch (200-500/day)', status: 'not-started' },
+                { id: 'email-10', text: 'Full campaign launch (200-500/day)', status: 'not-started' },
             ]
         },
         {
-            section: '🏛️ Legal & Business Foundation',
+            section: 'Legal & Business Foundation',
             week: 'Week 1',
             items: [
                 { id: 'legal-1', text: 'Register LLC — Texas SOS online ($300)', status: 'not-started' },
@@ -234,7 +234,7 @@ const SANO_DATA = {
             ]
         },
         {
-            section: '🔧 GHL Setup & Product Build',
+            section: 'GHL Setup & Product Build',
             week: 'Week 1-3',
             items: [
                 { id: 'ghl-1', text: 'Sign up for GHL SaaS Pro ($497/mo)', status: 'not-started' },
@@ -254,7 +254,7 @@ const SANO_DATA = {
             ]
         },
         {
-            section: '👷 VA Hiring & Onboarding',
+            section: 'VA Hiring & Onboarding',
             week: 'Week 1-2',
             items: [
                 { id: 'va-1', text: 'Write VA job description: "GHL Expert — 20 hrs/week — $850/mo"', status: 'not-started' },
@@ -267,7 +267,7 @@ const SANO_DATA = {
             ]
         },
         {
-            section: '🧪 Testing & Beta Client',
+            section: 'Testing & Beta Client',
             week: 'Week 3-5',
             items: [
                 { id: 'beta-1', text: 'Contact beta prospect (mechanic) — pitch free setup', status: 'not-started' },
@@ -280,7 +280,7 @@ const SANO_DATA = {
             ]
         },
         {
-            section: '👔 Sales Materials & Chris Training',
+            section: 'Sales Materials & Chris Training',
             week: 'Week 2-7',
             items: [
                 { id: 'sales-1', text: 'Chris training packet v1 written', status: 'done' },
@@ -299,7 +299,7 @@ const SANO_DATA = {
             ]
         },
         {
-            section: '🌐 Website & Brand',
+            section: 'Website & Brand',
             week: 'Week 4-8',
             items: [
                 { id: 'web-1', text: 'Brand identity finalized (logo, colors, fonts, voice guide)', status: 'not-started' },
@@ -313,7 +313,7 @@ const SANO_DATA = {
             ]
         },
         {
-            section: '📊 Operations & Finance',
+            section: 'Operations & Finance',
             week: 'Ongoing',
             items: [
                 { id: 'ops-1', text: 'Financial model — 3 scenarios (Conservative/Moderate/Aggressive)', status: 'in-progress' },
@@ -363,14 +363,14 @@ const SANO_DATA = {
 
     // ---- 8-Week Timeline ----
     weeks: [
-        { num: 0, name: 'Pre-Launch Sprint', dates: 'Apr 4-10', theme: '🏛️ Foundation & Cold Email Setup', status: 'active' },
-        { num: 1, name: 'Foundation', dates: 'Apr 11-17', theme: '🔧 GHL Setup & VA Hiring', status: 'upcoming' },
-        { num: 2, name: 'Product Build', dates: 'Apr 18-24', theme: '🏗️ VA Building + Snapshots', status: 'upcoming' },
-        { num: 3, name: 'Testing & QA', dates: 'Apr 25 - May 1', theme: '🧪 Internal Testing + Beta Client', status: 'upcoming' },
-        { num: 4, name: 'Beta & Polish', dates: 'May 2-8', theme: '🎯 Beta Live + Cold Email Full', status: 'upcoming' },
-        { num: 5, name: 'Sales Materials', dates: 'May 9-15', theme: '📦 Sales Kit + Chris Prep', status: 'upcoming' },
-        { num: 6, name: 'Chris Training', dates: 'May 16-22', theme: '🎓 Hands-on Training Week', status: 'upcoming' },
-        { num: 7, name: 'Soft Launch', dates: 'May 23-31', theme: '🚀 Final QA + LAUNCH', status: 'upcoming' },
+        { num: 0, name: 'Pre-Launch Sprint', dates: 'Apr 4-10', theme: 'Foundation & Cold Email Setup', status: 'active' },
+        { num: 1, name: 'Foundation', dates: 'Apr 11-17', theme: 'GHL Setup & VA Hiring', status: 'upcoming' },
+        { num: 2, name: 'Product Build', dates: 'Apr 18-24', theme: 'VA Building + Snapshots', status: 'upcoming' },
+        { num: 3, name: 'Testing & QA', dates: 'Apr 25 - May 1', theme: 'Internal Testing + Beta Client', status: 'upcoming' },
+        { num: 4, name: 'Beta & Polish', dates: 'May 2-8', theme: 'Beta Live + Cold Email Full', status: 'upcoming' },
+        { num: 5, name: 'Sales Materials', dates: 'May 9-15', theme: 'Sales Kit + Chris Prep', status: 'upcoming' },
+        { num: 6, name: 'Chris Training', dates: 'May 16-22', theme: 'Hands-on Training Week', status: 'upcoming' },
+        { num: 7, name: 'Soft Launch', dates: 'May 23-31', theme: 'Final QA + Launch', status: 'upcoming' },
     ],
 };
 

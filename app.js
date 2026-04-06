@@ -125,7 +125,7 @@ function renderPriorities() {
 
     container.innerHTML = SANO_DATA.priorities.map((p, i) => {
         const cls = p.done ? 'priority-done' : `priority-${p.priority}`;
-        const tag = p.done ? '✓ DONE' : p.priority.toUpperCase();
+        const tag = p.done ? 'DONE' : p.priority.toUpperCase();
         const tagCls = p.done ? '' : `tag-${p.priority}`;
         const hasSteps = p.steps && p.steps.length > 0;
         const timeTag = !p.done && p.timeEstimate ? `<span class="priority-time">${p.timeEstimate}</span>` : '';
@@ -135,7 +135,7 @@ function renderPriorities() {
                 <div class="steps-inner">
                     ${p.steps.map((step, si) => `
                         <div class="step-item ${p.done ? 'step-done' : ''}">
-                            <span class="step-num">${p.done ? '✅' : (si + 1)}</span>
+                            <span class="step-num">${p.done ? '✓' : (si + 1)}</span>
                             <span class="step-text">${step}</span>
                         </div>
                     `).join('')}
@@ -149,7 +149,7 @@ function renderPriorities() {
                     <div class="priority-checkbox" onclick="event.stopPropagation(); togglePriority(${i})"></div>
                     <span class="priority-text">${p.text}</span>
                     ${timeTag}
-                    <button class="comment-btn-sm" onclick="event.stopPropagation(); openComment('priority', '${p.text.replace(/'/g, "\\'")}')" title="Add note">💬</button>
+                    <button class="comment-btn-sm" onclick="event.stopPropagation(); openComment('priority', '${p.text.replace(/'/g, "\\'")}')" title="Add note">···</button>
                     <span class="priority-tag ${tagCls}">${tag}</span>
                     ${hasSteps && !p.done ? '<span class="priority-expand">▸</span>' : ''}
                 </div>
@@ -191,14 +191,14 @@ function renderAgentFeed() {
     const container = document.getElementById('agentFeed');
     if (!container) return;
     if (!SANO_DATA.agentReports.length) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">🌙</span>No agent activity yet.</div>';
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">—</span>No agent activity yet.</div>';
         return;
     }
     container.innerHTML = SANO_DATA.agentReports.map(r => {
         const statusCls = r.status === 'complete' ? 'status-complete' :
                           r.status === 'running' ? 'status-running' : 'status-failed';
-        const statusIcon = r.status === 'complete' ? '✅' :
-                           r.status === 'running' ? '🔄' : '❌';
+        const statusIcon = r.status === 'complete' ? '✓' :
+                           r.status === 'running' ? '•••' : '✗';
         return `
         <div class="agent-report">
             <div class="agent-report-header">
@@ -206,8 +206,8 @@ function renderAgentFeed() {
                 <span class="agent-time">${r.time}</span>
             </div>
             <div class="agent-message">${r.message}</div>
-            ${r.file ? `<span class="agent-file-link">📄 ${r.file}</span>` : ''}
-            <button class="comment-btn-sm" onclick="openComment('agent-report', '${r.agent} report')" title="Leave feedback">💬</button>
+            ${r.file ? `<span class="agent-file-link">${r.file}</span>` : ''}
+            <button class="comment-btn-sm" onclick="openComment('agent-report', '${r.agent} report')" title="Leave feedback">···</button>
         </div>`;
     }).join('');
 }
@@ -221,12 +221,12 @@ function renderChecklist() {
         const done = section.items.filter(i => i.status === 'done').length;
         const pct = total > 0 ? Math.round((done / total) * 100) : 0;
         const items = section.items.map((item, ii) => {
-            const icon = item.status === 'done' ? '✅' : item.status === 'in-progress' ? '🔄' : '⬜';
+            const icon = item.status === 'done' ? '✓' : item.status === 'in-progress' ? '•' : '‒';
             const cls = item.status === 'done' ? 'done' : '';
             return `<div class="checklist-item ${cls}" onclick="cycleStatus(${si},${ii})">
                 <span class="check-icon">${icon}</span>
                 <span>${item.text}</span>
-                <button class="comment-btn-sm" onclick="event.stopPropagation(); openComment('task', '${item.text.replace(/'/g, "\\'")}')" title="Comment">💬</button>
+                <button class="comment-btn-sm" onclick="event.stopPropagation(); openComment('task', '${item.text.replace(/'/g, "\\'")}')" title="Comment">···</button>
             </div>`;
         }).join('');
         return `
@@ -267,7 +267,7 @@ function renderApprovals() {
     if (!container) return;
     if (countEl) countEl.textContent = SANO_DATA.approvals.length;
     if (!SANO_DATA.approvals.length) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">✨</span>All caught up!</div>';
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">—</span>All caught up.</div>';
         return;
     }
     container.innerHTML = SANO_DATA.approvals.map((a, i) => `
@@ -275,9 +275,9 @@ function renderApprovals() {
             <div class="approval-title">${a.title}</div>
             <div class="approval-desc">${a.description}</div>
             <div class="approval-actions">
-                <button class="btn btn-approve" onclick="handleApproval(${i}, 'approved')">✓ Approve</button>
-                <button class="btn btn-review" onclick="openComment('approval', '${a.title.replace(/'/g, "\\'")}')">💬 Comment</button>
-                <button class="btn btn-reject" onclick="handleApproval(${i}, 'rejected')">✕ Reject</button>
+                <button class="btn btn-approve" onclick="handleApproval(${i}, 'approved')">Approve</button>
+                <button class="btn btn-review" onclick="openComment('approval', '${a.title.replace(/'/g, "\\'")}')">Comment</button>
+                <button class="btn btn-reject" onclick="handleApproval(${i}, 'rejected')">Reject</button>
             </div>
         </div>`).join('');
 }
@@ -369,7 +369,7 @@ function submitComment() {
     saveData();
 
     // Show confirmation
-    showToast(`Comment saved on "${modal.dataset.target}"`);
+    showToast(`Note saved: "${modal.dataset.target}"`);
 }
 
 function renderComments() {
@@ -379,12 +379,12 @@ function renderComments() {
     if (countEl) countEl.textContent = SANO_DATA.comments.length;
 
     if (!SANO_DATA.comments.length) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">📝</span>No comments yet. Click 💬 on any item to leave a note.</div>';
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">—</span>No notes yet.</div>';
         return;
     }
 
     container.innerHTML = SANO_DATA.comments.slice(0, 20).map(c => {
-        const icon = c.type === 'decision' ? '⚖️' : '💬';
+        const icon = c.type === 'decision' ? 'DECISION' : 'NOTE';
         const cls = c.type === 'decision' ? 'comment-decision' : '';
         return `
         <div class="comment-item ${cls}">
