@@ -36,19 +36,115 @@ const SANO_DATA = {
     },
 
     // ---- Today's Priorities ----
+    // RULE: Only items that can be completed in a 2-3 hour session.
+    // Overestimate time. Updated at end of each work session.
+    // lastUpdated tracks when priorities were last refreshed.
+    prioritiesLastUpdated: '2026-04-05T23:00:00-05:00',
     priorities: [
-        { id: 'p1', text: 'Install Docker + n8n on Mac Mini (Agent Infrastructure)', priority: 'critical', done: false },
-        { id: 'p2', text: 'Sign up for Instantly.ai ($47/mo Growth plan)', priority: 'critical', done: false },
-        { id: 'p3', text: 'Buy 2-3 cold email sending domains (~$30)', priority: 'critical', done: false },
-        { id: 'p4', text: 'Start email warmup in Instantly (14-day process)', priority: 'high', done: false },
-        { id: 'p5', text: 'Review Scout lead list — approve top 10 for Chris', priority: 'high', done: false },
-        { id: 'p6', text: 'Review Professor training packet — flag updates needed', priority: 'medium', done: false },
-        { id: 'p7', text: 'Finalize Growth tier pricing at $347/mo', priority: 'done', done: true },
-        { id: 'p8', text: 'Complete package proposal v1.0', priority: 'done', done: true },
+        {
+            id: 'p1', text: 'Sign up for Instantly.ai ($47/mo Growth plan)',
+            priority: 'critical', done: false, timeEstimate: '20 min',
+            steps: [
+                'Go to instantly.ai → Click "Start Free Trial" or "Get Started"',
+                'Select the Growth plan ($47/mo) — this gives 5,000 emails/mo',
+                'Create account with your business email (use personal for now)',
+                'Enter payment info (credit card)',
+                'Bookmark your Instantly dashboard — you\'ll be back here daily',
+            ]
+        },
+        {
+            id: 'p2', text: 'Buy 2-3 cold email sending domains (~$30)',
+            priority: 'critical', done: false, timeEstimate: '20 min',
+            steps: [
+                'Go to Namecheap.com or Porkbun.com',
+                'Search for variations: sanosolutionsmail.com, getsano.com, sanogrowth.com',
+                'Buy 2-3 domains ($10-15 each) — DON\'T use your main brand domain',
+                'These are "burner" sending domains to protect your main domain reputation',
+                'Save the domain login credentials somewhere secure',
+            ]
+        },
+        {
+            id: 'p3', text: 'Set up email accounts on new domains',
+            priority: 'high', done: false, timeEstimate: '30 min',
+            steps: [
+                'Option A: Zoho Mail (free for 1 user per domain) — zoho.com/mail',
+                'Option B: Google Workspace ($7/mo per user) — more credible',
+                'Create 1-2 mailboxes per domain: jasper@, hello@, or team@',
+                'Connect each domain to Zoho/Google (they walk you through DNS)',
+                'Send a test email from each new address to make sure it works',
+            ]
+        },
+        {
+            id: 'p4', text: 'Configure DNS records (SPF, DKIM, DMARC)',
+            priority: 'high', done: false, timeEstimate: '30 min',
+            steps: [
+                'Log into your domain registrar (Namecheap/Porkbun) → DNS settings',
+                'Add SPF record: TXT record provided by Zoho/Google',
+                'Add DKIM record: TXT record provided by Zoho/Google',
+                'Add DMARC record: v=DMARC1; p=none; (basic - can tighten later)',
+                'Verify all 3 records are green in Zoho/Google admin panel',
+                '⚠️ DNS can take up to 24-48 hours to fully propagate',
+            ]
+        },
+        {
+            id: 'p5', text: 'Start email warmup in Instantly',
+            priority: 'high', done: false, timeEstimate: '15 min',
+            steps: [
+                'In Instantly dashboard → "Email Accounts" → "Add Account"',
+                'Connect each email address via SMTP/IMAP (Instantly guides you)',
+                'Turn ON warmup for every connected account',
+                'Set warmup speed to "Slow" (recommended for new domains)',
+                '✅ Warmup runs automatically for 14 days — no action needed after this',
+            ]
+        },
+        {
+            id: 'p6', text: 'Review Scout lead list — approve top 10 for Chris',
+            priority: 'medium', done: false, timeEstimate: '20 min',
+            steps: [
+                'Open agents/scout/master-lead-list.md in the SANO folder',
+                'Scan the 39 leads — focus on Score 6+ businesses',
+                'Pick top 10 that have: no website, bad reviews, or clearly outdated',
+                'Star/mark the ones Chris should call first on Day 1',
+                'Leave a comment on the Command Center with your picks',
+            ]
+        },
+        // Completed items from tonight
+        {
+            id: 'p7', text: 'Configure Pipeline Mode (agent delegation system)',
+            priority: 'done', done: true, timeEstimate: '—',
+            steps: ['✅ Completed Apr 5 — 7 brain files configured, Pipeline Mode active']
+        },
+        {
+            id: 'p8', text: 'Fix Telegram bot + connect 3 daily cron jobs',
+            priority: 'done', done: true, timeEstimate: '—',
+            steps: ['✅ Completed Apr 5 — Token regenerated, 8AM/2PM/8PM briefings scheduled']
+        },
+        {
+            id: 'p9', text: 'Upgrade FlowVoice dictation (smart formatting)',
+            priority: 'done', done: true, timeEstimate: '—',
+            steps: ['✅ Completed Apr 5 — Gemini 2.5 Flash, list formatting, voice commands']
+        },
+        {
+            id: 'p10', text: 'Finalize Growth tier pricing at $347/mo',
+            priority: 'done', done: true, timeEstimate: '—',
+            steps: ['✅ Completed — Locked in pricing structure']
+        },
+        {
+            id: 'p11', text: 'Complete package proposal v1.0',
+            priority: 'done', done: true, timeEstimate: '—',
+            steps: ['✅ Completed — Full proposal doc finalized']
+        },
     ],
 
     // ---- Agent Overnight Reports ----
     agentReports: [
+        {
+            agent: '⚙️ Overseer',
+            time: '10:08 PM — Apr 5',
+            message: 'Pipeline Mode activated. 7 brain files deployed (SOUL, IDENTITY, BOOTSTRAP, USER, HEARTBEAT, TOOLS, AGENTS). Hierarchical delegation pattern live. QA gate via Agent Zero enabled.',
+            file: null,
+            status: 'complete'
+        },
         {
             agent: '🔍 Scout',
             time: '10:16 PM — Apr 4',

@@ -90,20 +90,67 @@ function scrollToWeek(weekIndex) {
     }
 }
 
-/* --- Priorities --- */
+/* --- Priorities (Expandable with Action Plans) --- */
 function renderPriorities() {
     const container = document.getElementById('priorityList');
     if (!container) return;
+
+    // Calculate total estimated time for undone items
+    const activePriorities = SANO_DATA.priorities.filter(p => !p.done);
+    const totalMinutes = activePriorities.reduce((sum, p) => {
+        const match = p.timeEstimate?.match(/(\d+)/);
+        return sum + (match ? parseInt(match[1]) : 0);
+    }, 0);
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+
+    // Add time estimate header
+    const timeHeader = document.getElementById('priorityTimeEstimate');
+    if (timeHeader) {
+        timeHeader.textContent = activePriorities.length > 0
+            ? `~${timeStr} estimated`
+            : 'All clear!';
+    }
+
+    // Updated timestamp
+    const updatedEl = document.getElementById('priorityUpdated');
+    if (updatedEl && SANO_DATA.prioritiesLastUpdated) {
+        const d = new Date(SANO_DATA.prioritiesLastUpdated);
+        updatedEl.textContent = `Updated: ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    }
+
     container.innerHTML = SANO_DATA.priorities.map((p, i) => {
         const cls = p.done ? 'priority-done' : `priority-${p.priority}`;
         const tag = p.done ? '✓ DONE' : p.priority.toUpperCase();
         const tagCls = p.done ? '' : `tag-${p.priority}`;
+        const hasSteps = p.steps && p.steps.length > 0;
+        const timeTag = !p.done && p.timeEstimate ? `<span class="priority-time">${p.timeEstimate}</span>` : '';
+
+        const stepsHtml = hasSteps ? `
+            <div class="priority-steps" id="steps-${i}">
+                <div class="steps-inner">
+                    ${p.steps.map((step, si) => `
+                        <div class="step-item ${p.done ? 'step-done' : ''}">
+                            <span class="step-num">${p.done ? '✅' : (si + 1)}</span>
+                            <span class="step-text">${step}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
+
         return `
             <div class="priority-item ${cls}" id="priority-${i}">
-                <div class="priority-checkbox" onclick="togglePriority(${i})"></div>
-                <span class="priority-text">${p.text}</span>
-                <button class="comment-btn-sm" onclick="openComment('priority', '${p.text}')" title="Add comment">💬</button>
-                <span class="priority-tag ${tagCls}">${tag}</span>
+                <div class="priority-row" onclick="expandPriority(${i})">
+                    <div class="priority-checkbox" onclick="event.stopPropagation(); togglePriority(${i})"></div>
+                    <span class="priority-text">${p.text}</span>
+                    ${timeTag}
+                    <button class="comment-btn-sm" onclick="event.stopPropagation(); openComment('priority', '${p.text.replace(/'/g, "\\'")}')" title="Add note">💬</button>
+                    <span class="priority-tag ${tagCls}">${tag}</span>
+                    ${hasSteps && !p.done ? '<span class="priority-expand">▸</span>' : ''}
+                </div>
+                ${stepsHtml}
             </div>`;
     }).join('');
 }
@@ -114,6 +161,26 @@ function togglePriority(i) {
     renderPriorities();
     updateProgressStats();
     saveData();
+}
+
+function expandPriority(i) {
+    const p = SANO_DATA.priorities[i];
+    if (p.done || !p.steps || p.steps.length === 0) return;
+
+    const el = document.getElementById(`steps-${i}`);
+    if (!el) return;
+
+    // Close all other open steps
+    document.querySelectorAll('.priority-steps.open').forEach(s => {
+        if (s !== el) s.classList.remove('open');
+    });
+    document.querySelectorAll('.priority-expand.rotated').forEach(e => {
+        e.classList.remove('rotated');
+    });
+
+    el.classList.toggle('open');
+    const expandIcon = el.closest('.priority-item')?.querySelector('.priority-expand');
+    if (expandIcon) expandIcon.classList.toggle('rotated');
 }
 
 /* --- Agent Feed --- */
