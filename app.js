@@ -3,7 +3,7 @@
    Mission Control Logic
    ============================================ */
 
-const DATA_VERSION = '2026-04-06-v5';
+const DATA_VERSION = '2026-04-11-v10-week1-start';
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedData();

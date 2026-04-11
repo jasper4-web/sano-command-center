@@ -8,8 +8,6 @@
    LAST UPDATED: April 11, 2026 (Week 1 Start — Harness + Brain OS complete)
    ============================================ */
 
-const DATA_VERSION = 'v6.0';
-
 const SANO_DATA = {
 
     // ---- Launch Date ----
