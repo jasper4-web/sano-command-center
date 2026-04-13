@@ -28,6 +28,9 @@
         </div>
     </header>
 
+    <!-- ===================== ALERT PANEL ===================== -->
+    <section class="alert-panel" id="alertPanel"></section>
+
     <!-- ===================== HERO ===================== -->
     <section class="hero">
         <div class="hero-inner">
@@ -57,51 +60,124 @@
                     <span class="status-text">Systems Online</span>
                 </div>
                 <div class="hero-week" id="currentWeekLabel"></div>
+                <div class="hero-ai-pct">AI Automation: 75-80%</div>
+                <div class="hero-directive" id="heroDirective"></div>
             </div>
         </div>
+
+        <!-- Overnight Agents Card -->
+        <div class="overnight-card" id="overnightCard">
+            <div class="overnight-header">
+                <div class="overnight-title">
+                    <span class="overnight-icon">🌙</span>
+                    <span>Overnight Agents</span>
+                </div>
+                <div class="overnight-status" id="overnightStatus">
+                    <span class="overnight-status-dot"></span>
+                    <span>RUNNING NOW</span>
+                </div>
+            </div>
+            <div class="overnight-meta" id="overnightMeta"></div>
+            <div class="overnight-tasks" id="overnightTasks"></div>
+        </div>
+
+        <!-- Launch Burndown -->
+        <div class="burndown-card">
+            <div class="burndown-header">
+                <span class="burndown-title">📋 Launch Burndown</span>
+                <span class="burndown-badge" id="burndownBadge">ON PACE</span>
+            </div>
+            <div class="burndown-chart" id="burndownChart"></div>
+            <div class="burndown-stats" id="burndownStats"></div>
+        </div>
+
         <!-- Week Timeline -->
         <div class="week-strip">
             <div class="week-timeline" id="weekTimeline"></div>
         </div>
     </section>
 
-    <!-- ===================== SYSTEM HEALTH ===================== -->
-    <section class="health-strip">
-        <div class="health-item health-readiness">
-            <div class="health-top">
-                <span class="health-label">Launch Readiness</span>
-                <span class="health-value" id="overallPercent">0%</span>
+    <!-- ===================== KPI STRIP ===================== -->
+    <section class="kpi-strip">
+        <div class="kpi-card">
+            <div class="kpi-top">
+                <span class="kpi-label">Launch Readiness</span>
+                <span class="kpi-value" id="kpiReadiness">0%</span>
             </div>
-            <div class="health-bar"><div class="health-bar-fill" id="overallBar"></div></div>
-            <div class="health-meta">
-                <span><strong id="completedTasks">0</strong> done</span>
-                <span><strong id="inProgressTasks">0</strong> active</span>
-                <span><strong id="remainingTasks">0</strong> left</span>
+            <div class="kpi-meta">
+                <span><strong id="kpiDone">0</strong> done</span>
+                <span><strong id="kpiActive">0</strong> active</span>
+                <span><strong id="kpiLeft">0</strong> left</span>
             </div>
         </div>
-        <div class="health-divider"></div>
-        <div class="health-item health-budget">
-            <div class="health-top">
-                <span class="health-label">Budget</span>
-                <span class="health-value budget-remaining-val" id="budgetRemaining">$19,000</span>
+        <div class="kpi-card">
+            <div class="kpi-top">
+                <span class="kpi-label">Budget</span>
+                <span class="kpi-value kpi-budget" id="kpiBudget">$0</span>
             </div>
-            <div class="health-bar"><div class="health-bar-fill budget-bar-fill" id="budgetBar"></div></div>
-            <div class="health-meta budget-meta">
-                <span>Spent <strong id="budgetSpent">$0</strong></span>
-                <span>Projected <strong id="budgetProjected">$0</strong></span>
-                <span>Burn <strong id="budgetBurn">$0/wk</strong></span>
-                <span>Runway <strong id="budgetRunway">—</strong></span>
+            <div class="kpi-meta">
+                <span>Burn <strong id="kpiBurn">$0/mo</strong></span>
+                <span>Runway <strong id="kpiRunway">—</strong></span>
+                <span>Break-even <strong id="kpiBreakeven">—</strong></span>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-top">
+                <span class="kpi-label">Agent Spend</span>
+                <span class="kpi-value kpi-agent" id="kpiAgentSpend">$0</span>
+            </div>
+            <div class="kpi-meta">
+                <span>Tonight <strong id="kpiAgentTonight">$0/$15</strong></span>
+                <span>Month <strong id="kpiAgentMonth">$0/$200</strong></span>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-top">
+                <span class="kpi-label">Email Warmup</span>
+                <span class="kpi-value kpi-warmup" id="kpiWarmupDay">Day 0</span>
+            </div>
+            <div class="kpi-meta">
+                <span>Ready <strong id="kpiWarmupReady">—</strong></span>
+                <span>GHL <strong id="kpiGHL">0/37</strong></span>
+                <span>SOPs <strong id="kpiSOPs">0</strong></span>
             </div>
         </div>
     </section>
 
+    <!-- ===================== TAB NAVIGATION ===================== -->
+    <nav class="tab-nav" id="tabNav">
+        <button class="tab-btn active" data-tab="jasper" onclick="switchTab('jasper')">
+            <span class="tab-icon">👤</span>
+            <span class="tab-label">Jasper's Tasks</span>
+            <span class="tab-count" id="tabCountJasper">0</span>
+        </button>
+        <button class="tab-btn" data-tab="ai" onclick="switchTab('ai')">
+            <span class="tab-icon">🤖</span>
+            <span class="tab-label">AI Agent Tasks</span>
+            <span class="tab-count" id="tabCountAI">0</span>
+        </button>
+        <button class="tab-btn" data-tab="activity" onclick="switchTab('activity')">
+            <span class="tab-icon">◎</span>
+            <span class="tab-label">Activity</span>
+        </button>
+        <button class="tab-btn" data-tab="intel" onclick="switchTab('intel')">
+            <span class="tab-icon">📚</span>
+            <span class="tab-label">Intel & Docs</span>
+        </button>
+        <button class="tab-btn" data-tab="completed" onclick="switchTab('completed')">
+            <span class="tab-icon">✓</span>
+            <span class="tab-label">Completed</span>
+            <span class="tab-count" id="tabCountCompleted">0</span>
+        </button>
+    </nav>
+
     <!-- ===================== MAIN CONTENT ===================== -->
     <main class="main">
 
-        <!-- Today's Priorities (primary workspace) -->
-        <section class="section section-priorities" id="sectionPriorities">
+        <!-- TAB: Jasper's Tasks -->
+        <section class="tab-panel active" id="panel-jasper">
             <div class="section-header">
-                <h2>Today's Priorities</h2>
+                <h2>Jasper's Tasks</h2>
                 <div class="priority-meta">
                     <span class="time-badge" id="priorityTimeEstimate"></span>
                     <span class="meta-text" id="priorityUpdated"></span>
@@ -110,45 +186,52 @@
             <div class="priority-list" id="priorityList"></div>
         </section>
 
-        <!-- Agent Activity (live feed) -->
-        <section class="section section-agents" id="sectionAgents">
+        <!-- TAB: AI Agent Tasks -->
+        <section class="tab-panel" id="panel-ai">
+            <div class="section-header">
+                <h2>AI Agent Tasks</h2>
+                <span class="meta-text">Handled by overnight agents + Antigravity + MCP</span>
+            </div>
+            <div class="ai-task-list" id="aiTaskList"></div>
+        </section>
+
+        <!-- TAB: Activity -->
+        <section class="tab-panel" id="panel-activity">
             <div class="section-header">
                 <h2>Agent Activity</h2>
                 <span class="section-badge">Live Feed</span>
             </div>
+            <!-- Agent Cost Breakdown -->
+            <div class="cost-breakdown" id="costBreakdown"></div>
+            <!-- 7-Day Spend Chart -->
+            <div class="spend-chart-card" id="spendChartCard"></div>
+            <!-- Decision Journal -->
+            <div class="decision-journal">
+                <div class="decision-header">
+                    <h3>Decision Journal</h3>
+                    <div class="decision-filters" id="decisionFilters"></div>
+                </div>
+                <div class="decision-list" id="decisionList"></div>
+            </div>
+            <!-- Agent Feed -->
             <div class="agent-feed" id="agentFeed"></div>
         </section>
 
-        <!-- Build Progress (secondary) -->
-        <section class="section section-build" id="sectionChecklist">
+        <!-- TAB: Intel & Docs -->
+        <section class="tab-panel" id="panel-intel">
             <div class="section-header">
-                <h2>Build Progress</h2>
-                <span class="section-badge">8-Week Plan</span>
+                <h2>Intel & Docs</h2>
             </div>
-            <div class="checklist-sections" id="checklistSections"></div>
+            <div class="intel-list" id="intelList"></div>
         </section>
 
-        <!-- Approvals + Notes (bottom row) -->
-        <div class="bottom-row">
-            <section class="section section-approvals" id="sectionApprovals">
-                <div class="section-header">
-                    <h2>Approvals</h2>
-                    <span class="approval-count-badge" id="approvalCount">0</span>
-                </div>
-                <div class="approval-list" id="approvalList"></div>
-            </section>
-
-            <section class="section section-notes">
-                <div class="section-header">
-                    <h2>Notes</h2>
-                    <div style="display:flex;gap:8px;align-items:center">
-                        <span class="meta-text" id="commentCount">0</span>
-                        <button class="btn-sm" onclick="copyAllComments()">Copy All</button>
-                    </div>
-                </div>
-                <div class="comment-feed" id="commentFeed"></div>
-            </section>
-        </div>
+        <!-- TAB: Completed -->
+        <section class="tab-panel" id="panel-completed">
+            <div class="section-header">
+                <h2>Completed</h2>
+            </div>
+            <div class="completed-list" id="completedList"></div>
+        </section>
 
     </main>
 
@@ -172,10 +255,12 @@
 
     <!-- Dock -->
     <nav class="dock">
+        <button class="dock-btn" onclick="switchTab('jasper')" title="Tasks">👤</button>
+        <button class="dock-btn" onclick="switchTab('ai')" title="AI Tasks">🤖</button>
+        <button class="dock-btn" onclick="switchTab('activity')" title="Activity">◎</button>
+        <button class="dock-btn" onclick="switchTab('intel')" title="Intel">📚</button>
+        <button class="dock-btn" onclick="switchTab('completed')" title="Completed">✓</button>
         <button class="dock-btn" onclick="refreshDashboard()" title="Refresh">↻</button>
-        <button class="dock-btn" onclick="scrollToSection('sectionAgents')" title="Agents">◎</button>
-        <button class="dock-btn" onclick="scrollToSection('sectionChecklist')" title="Build">☰</button>
-        <button class="dock-btn" onclick="copyAllComments()" title="Export">↗</button>
     </nav>
 
     <script src="data.js"></script>

@@ -1,28 +1,32 @@
 /* ============================================
-   SANO COMMAND CENTER — v5.0
-   Mission Control Logic
+   SANO COMMAND CENTER — App Logic v8.0
+   Full rebuild: tabs, burndown, overnight panel,
+   AI tasks, cost breakdown, decisions, alerts
    ============================================ */
-
-const DATA_VERSION = '2026-04-11-v10-week1-start';
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedData();
     initClock();
     initCountdown();
+    renderAlerts();
+    renderOvernightCard();
+    renderBurndown();
     renderWeekTimeline();
+    renderKPI();
     renderPriorities();
+    renderAITasks();
     renderAgentFeed();
-    renderChecklist();
-    renderApprovals();
-    renderComments();
-    renderBudget();
-    updateProgressStats();
+    renderCostBreakdown();
+    renderDecisions();
+    renderIntelDocs();
+    renderCompleted();
+    updateTabCounts();
 
     setInterval(updateClock, 1000);
     setInterval(updateCountdown, 60000);
 });
 
-/* --- Clock & Date --- */
+/* ===================== CLOCK ===================== */
 function initClock() { updateClock(); updateDateDisplay(); }
 
 function updateClock() {
@@ -40,17 +44,12 @@ function updateDateDisplay() {
     });
 }
 
-/* --- Countdown --- */
+/* ===================== COUNTDOWN ===================== */
 function initCountdown() { updateCountdown(); }
 
 function updateCountdown() {
     const diff = SANO_DATA.launchDate - new Date();
-    if (diff <= 0) {
-        setText('countDays', '00');
-        setText('countHours', '00');
-        setText('countMins', '00');
-        return;
-    }
+    if (diff <= 0) { setText('countDays', '00'); setText('countHours', '00'); setText('countMins', '00'); return; }
     const d = Math.floor(diff / 864e5);
     const h = Math.floor((diff % 864e5) / 36e5);
     const m = Math.floor((diff % 36e5) / 6e4);
@@ -58,27 +57,215 @@ function updateCountdown() {
     setText('countHours', String(h).padStart(2, '0'));
     setText('countMins', String(m).padStart(2, '0'));
 
-    // Update current week label
     const activeWeek = SANO_DATA.weeks.find(w => w.status === 'active');
-    if (activeWeek) {
-        setText('currentWeekLabel', `W${activeWeek.num} — ${activeWeek.name}`);
-    }
+    if (activeWeek) setText('currentWeekLabel', `W${activeWeek.num} — ${activeWeek.name}`);
 }
 
-/* --- Week Timeline --- */
-function renderWeekTimeline() {
-    const container = document.getElementById('weekTimeline');
-    if (!container) return;
-    container.innerHTML = SANO_DATA.weeks.map((w, i) => `
-        <div class="week-block ${w.status}" title="${w.theme}" onclick="scrollToSection('sectionChecklist')" style="cursor:pointer">
-            <span class="week-num">W${w.num}</span>
-            <span class="week-name">${w.name}</span>
-            <span class="week-dates">${w.dates}</span>
+/* ===================== ALERTS ===================== */
+function renderAlerts() {
+    const panel = document.getElementById('alertPanel');
+    if (!panel || !SANO_DATA.alerts || !SANO_DATA.alerts.length) {
+        if (panel) panel.style.display = 'none';
+        return;
+    }
+    panel.style.display = 'block';
+    panel.innerHTML = SANO_DATA.alerts.map((a, i) => `
+        <div class="alert-item alert-${a.severity || 'warning'}">
+            <span class="alert-icon">${a.severity === 'critical' ? '🔴' : '🟡'}</span>
+            <span class="alert-text">${a.message}</span>
+            <button class="alert-dismiss" onclick="dismissAlert(${i})">✕</button>
         </div>
     `).join('');
 }
 
-/* --- Priorities --- */
+function dismissAlert(i) {
+    SANO_DATA.alerts.splice(i, 1);
+    renderAlerts();
+    saveData();
+}
+
+/* ===================== OVERNIGHT AGENTS ===================== */
+function renderOvernightCard() {
+    const ov = SANO_DATA.overnight;
+    if (!ov) return;
+
+    const statusEl = document.getElementById('overnightStatus');
+    if (statusEl) {
+        const statusClass = ov.status === 'running' ? 'running' : ov.status === 'complete' ? 'complete' : 'idle';
+        const statusText = ov.status === 'running' ? 'RUNNING NOW' : ov.status === 'complete' ? 'COMPLETE' : 'IDLE';
+        statusEl.className = `overnight-status ${statusClass}`;
+        statusEl.innerHTML = `<span class="overnight-status-dot"></span><span>${statusText}</span>`;
+    }
+
+    const completed = ov.tasks.filter(t => t.status === 'complete').length;
+    const metaEl = document.getElementById('overnightMeta');
+    if (metaEl) metaEl.textContent = `${completed}/${ov.tasks.length} Tasks    $${ov.totalCost.toFixed(2)} spent    Started ${ov.startTime}`;
+
+    const tasksEl = document.getElementById('overnightTasks');
+    if (tasksEl) {
+        tasksEl.innerHTML = ov.tasks.map(t => {
+            const cls = t.status === 'running' ? 'ot-active' : t.status === 'complete' ? 'ot-done' : 'ot-queued';
+            return `<span class="ot-pill ${cls}">${t.status === 'running' ? '◉ ' : ''}${t.name}</span>`;
+        }).join('');
+    }
+
+    // Directive badge
+    const totalEst = ov.tasks.reduce((sum, t) => sum + (t.estCost || 0), 0);
+    const directiveEl = document.getElementById('heroDirective');
+    if (directiveEl) {
+        directiveEl.innerHTML = `<span class="directive-badge">🚀 Tonight: ${ov.tasks.length} tasks pre-approved (~$${totalEst.toFixed(2)})</span>`;
+    }
+}
+
+/* ===================== BURNDOWN CHART ===================== */
+function renderBurndown() {
+    const container = document.getElementById('burndownChart');
+    const statsEl = document.getElementById('burndownStats');
+    const badgeEl = document.getElementById('burndownBadge');
+    if (!container || !SANO_DATA.burndown) return;
+
+    const bd = SANO_DATA.burndown;
+    const startDate = new Date('2026-04-04');
+    const endDate = new Date('2026-06-01');
+    const totalDays = Math.ceil((endDate - startDate) / 864e5);
+
+    const w = 460, h = 180, pad = { top: 20, right: 20, bottom: 30, left: 40 };
+    const chartW = w - pad.left - pad.right;
+    const chartH = h - pad.top - pad.bottom;
+
+    // Ideal line
+    const idealStart = { x: pad.left, y: pad.top };
+    const idealEnd = { x: pad.left + chartW, y: pad.top + chartH };
+
+    // Actual points
+    const actualPoints = bd.dataPoints.map(dp => {
+        const dpDate = new Date(dp.date);
+        const dayNum = Math.ceil((dpDate - startDate) / 864e5);
+        const x = pad.left + (dayNum / totalDays) * chartW;
+        const y = pad.top + ((bd.totalTasks - dp.remaining) / bd.totalTasks) * chartH;
+        // Invert: y should be high when remaining is high
+        const yActual = pad.top + (dp.remaining / bd.totalTasks) * chartH;
+        return { x, y: yActual };
+    });
+
+    // Determine pace
+    const latestRemaining = bd.dataPoints[bd.dataPoints.length - 1].remaining;
+    const daysSoFar = bd.dataPoints.length;
+    const idealRemaining = bd.totalTasks - (bd.totalTasks / totalDays) * daysSoFar;
+    let paceStatus = 'ON PACE';
+    let paceClass = 'pace-on';
+    if (latestRemaining < idealRemaining - 3) { paceStatus = 'AHEAD'; paceClass = 'pace-ahead'; }
+    else if (latestRemaining > idealRemaining + 3) { paceStatus = 'BEHIND'; paceClass = 'pace-behind'; }
+
+    if (badgeEl) { badgeEl.textContent = paceStatus; badgeEl.className = `burndown-badge ${paceClass}`; }
+
+    // Build SVG
+    const actualPath = actualPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+    const lastPoint = actualPoints[actualPoints.length - 1];
+
+    container.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" class="burndown-svg">
+            <!-- Grid lines -->
+            <line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + chartH}" stroke="#333" stroke-width="1"/>
+            <line x1="${pad.left}" y1="${pad.top + chartH}" x2="${pad.left + chartW}" y2="${pad.top + chartH}" stroke="#333" stroke-width="1"/>
+            <!-- Y labels -->
+            <text x="${pad.left - 8}" y="${pad.top + 5}" fill="#666" font-size="10" text-anchor="end">${bd.totalTasks}</text>
+            <text x="${pad.left - 8}" y="${pad.top + chartH / 2 + 3}" fill="#666" font-size="10" text-anchor="end">${Math.round(bd.totalTasks / 2)}</text>
+            <text x="${pad.left - 8}" y="${pad.top + chartH + 3}" fill="#666" font-size="10" text-anchor="end">0</text>
+            <!-- X labels -->
+            <text x="${pad.left}" y="${h - 5}" fill="#666" font-size="10" text-anchor="start">Apr 4</text>
+            <text x="${pad.left + chartW / 2}" y="${h - 5}" fill="#666" font-size="10" text-anchor="middle">May 1</text>
+            <text x="${pad.left + chartW}" y="${h - 5}" fill="#666" font-size="10" text-anchor="end">Jun 1</text>
+            <!-- Ideal line (dotted) -->
+            <line x1="${idealStart.x}" y1="${idealStart.y}" x2="${idealEnd.x}" y2="${idealEnd.y}" stroke="#555" stroke-width="1.5" stroke-dasharray="6,4"/>
+            <!-- Actual line -->
+            <path d="${actualPath}" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Current position dot -->
+            <circle cx="${lastPoint.x}" cy="${lastPoint.y}" r="4" fill="#22c55e" stroke="#0a0a0a" stroke-width="2"/>
+        </svg>
+    `;
+
+    // Stats
+    const tasksPerDay = ((bd.totalTasks - latestRemaining) / daysSoFar).toFixed(1);
+    if (statsEl) {
+        statsEl.innerHTML = `
+            <span>${latestRemaining} tasks left</span>
+            <span>~${tasksPerDay} tasks/day avg</span>
+            <span class="burndown-legend"><span class="legend-ideal"></span> ideal</span>
+            <span class="burndown-legend"><span class="legend-actual"></span> actual</span>
+        `;
+    }
+}
+
+/* ===================== WEEK TIMELINE ===================== */
+function renderWeekTimeline() {
+    const container = document.getElementById('weekTimeline');
+    if (!container) return;
+    container.innerHTML = SANO_DATA.weeks.map(w => {
+        const deps = SANO_DATA.weekDeps[w.num] || [];
+        const depsHtml = deps.map(d => {
+            const cls = d.status === 'done' ? 'dep-done' : d.status === 'blocker' ? 'dep-blocker' : 'dep-upcoming';
+            return `<span class="dep-tag ${cls}">${d.label}</span>`;
+        }).join('');
+        return `
+            <div class="week-block ${w.status}" title="${w.theme}">
+                <span class="week-icon">${w.icon || ''}</span>
+                <span class="week-num">W${w.num}</span>
+                <span class="week-name">${w.name}</span>
+                <span class="week-dates">${w.dates}</span>
+                ${depsHtml ? `<div class="week-deps">${depsHtml}</div>` : ''}
+            </div>`;
+    }).join('');
+}
+
+/* ===================== KPI STRIP ===================== */
+function renderKPI() {
+    const allItems = SANO_DATA.checklist.flatMap(s => s.items);
+    const total = allItems.length;
+    const done = allItems.filter(i => i.status === 'done').length;
+    const active = allItems.filter(i => i.status === 'in-progress').length;
+    const left = total - done - active;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    setText('kpiReadiness', `${pct}%`);
+    setText('kpiDone', done);
+    setText('kpiActive', active);
+    setText('kpiLeft', left);
+
+    const kpi = SANO_DATA.kpi;
+    setText('kpiBudget', `$${kpi.budget.remaining.toLocaleString()}`);
+    setText('kpiBurn', `$${kpi.budget.burn}/mo`);
+    setText('kpiRunway', `${kpi.budget.runway} months`);
+    setText('kpiBreakeven', kpi.budget.breakeven);
+
+    setText('kpiAgentSpend', `$${kpi.agentSpend.tonight.toFixed(2)}`);
+    setText('kpiAgentTonight', `$${kpi.agentSpend.tonight.toFixed(2)}/$${kpi.agentSpend.tonightCap}`);
+    setText('kpiAgentMonth', `$${kpi.agentSpend.month.toFixed(2)}/$${kpi.agentSpend.monthCap}`);
+
+    setText('kpiWarmupDay', `Day ${kpi.emailWarmup.day}`);
+    setText('kpiWarmupReady', kpi.emailWarmup.readyDate);
+    setText('kpiGHL', `${kpi.emailWarmup.ghlSetup}/${kpi.emailWarmup.ghlTotal}`);
+    setText('kpiSOPs', kpi.emailWarmup.sops);
+}
+
+/* ===================== TAB NAVIGATION ===================== */
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(`panel-${tab}`)?.classList.add('active');
+}
+
+function updateTabCounts() {
+    const jasperCount = SANO_DATA.priorities.filter(p => !p.done).length;
+    const aiCount = SANO_DATA.aiAgentTasks.reduce((sum, s) => sum + s.tasks.length, 0);
+    const completedCount = SANO_DATA.priorities.filter(p => p.done).length;
+    setText('tabCountJasper', jasperCount);
+    setText('tabCountAI', aiCount);
+    setText('tabCountCompleted', completedCount);
+}
+
+/* ===================== JASPER'S PRIORITIES ===================== */
 function renderPriorities() {
     const container = document.getElementById('priorityList');
     if (!container) return;
@@ -92,8 +279,7 @@ function renderPriorities() {
     const mins = totalMinutes % 60;
     const timeStr = hours > 0 ? `~${hours}h ${mins}m` : `~${mins}m`;
 
-    const timeHeader = document.getElementById('priorityTimeEstimate');
-    if (timeHeader) timeHeader.textContent = activePriorities.length > 0 ? timeStr : 'Clear';
+    setText('priorityTimeEstimate', activePriorities.length > 0 ? timeStr : 'Clear');
 
     const updatedEl = document.getElementById('priorityUpdated');
     if (updatedEl && SANO_DATA.prioritiesLastUpdated) {
@@ -101,19 +287,20 @@ function renderPriorities() {
         updatedEl.textContent = `Updated ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
     }
 
-    container.innerHTML = SANO_DATA.priorities.map((p, i) => {
-        const cls = p.done ? 'priority-done' : `priority-${p.priority}`;
-        const tag = p.done ? 'DONE' : p.priority.toUpperCase();
-        const tagCls = p.done ? '' : `tag-${p.priority}`;
+    container.innerHTML = activePriorities.map((p, i) => {
+        const origIndex = SANO_DATA.priorities.indexOf(p);
+        const cls = `priority-${p.priority}`;
+        const tag = p.priority.toUpperCase();
+        const tagCls = `tag-${p.priority}`;
         const hasSteps = p.steps && p.steps.length > 0;
-        const timeTag = !p.done && p.timeEstimate ? `<span class="priority-time">${p.timeEstimate}</span>` : '';
+        const timeTag = p.timeEstimate ? `<span class="priority-time">${p.timeEstimate}</span>` : '';
 
         const stepsHtml = hasSteps ? `
-            <div class="priority-steps" id="steps-${i}">
+            <div class="priority-steps" id="steps-${origIndex}">
                 <div class="steps-inner">
                     ${p.steps.map((step, si) => `
-                        <div class="step-item ${p.done ? 'step-done' : ''}">
-                            <span class="step-num">${p.done ? '✓' : (si + 1)}</span>
+                        <div class="step-item">
+                            <span class="step-num">${si + 1}</span>
                             <span class="step-text">${step}</span>
                         </div>
                     `).join('')}
@@ -122,14 +309,13 @@ function renderPriorities() {
         ` : '';
 
         return `
-            <div class="priority-item ${cls}" id="priority-${i}">
-                <div class="priority-row" onclick="expandPriority(${i})">
-                    <div class="priority-checkbox" onclick="event.stopPropagation(); togglePriority(${i})"></div>
+            <div class="priority-item ${cls}" id="priority-${origIndex}">
+                <div class="priority-row" onclick="expandPriority(${origIndex})">
+                    <div class="priority-checkbox" onclick="event.stopPropagation(); togglePriority(${origIndex})"></div>
                     <span class="priority-text">${p.text}</span>
                     ${timeTag}
-                    <button class="comment-btn-sm" onclick="event.stopPropagation(); openComment('priority', '${p.text.replace(/'/g, "\\'")}')" title="Add note">···</button>
                     <span class="priority-tag ${tagCls}">${tag}</span>
-                    ${hasSteps && !p.done ? '<span class="priority-expand">▸</span>' : ''}
+                    ${hasSteps ? '<span class="priority-expand">▸</span>' : ''}
                 </div>
                 ${stepsHtml}
             </div>`;
@@ -140,7 +326,8 @@ function togglePriority(i) {
     SANO_DATA.priorities[i].done = !SANO_DATA.priorities[i].done;
     if (SANO_DATA.priorities[i].done) SANO_DATA.priorities[i].priority = 'done';
     renderPriorities();
-    updateProgressStats();
+    renderCompleted();
+    updateTabCounts();
     saveData();
 }
 
@@ -150,13 +337,146 @@ function expandPriority(i) {
     const el = document.getElementById(`steps-${i}`);
     if (!el) return;
     document.querySelectorAll('.priority-steps.open').forEach(s => { if (s !== el) s.classList.remove('open'); });
-    document.querySelectorAll('.priority-expand.rotated').forEach(e => e.classList.remove('rotated'));
     el.classList.toggle('open');
     const expandIcon = el.closest('.priority-item')?.querySelector('.priority-expand');
     if (expandIcon) expandIcon.classList.toggle('rotated');
 }
 
-/* --- Agent Feed --- */
+/* ===================== AI AGENT TASKS ===================== */
+function renderAITasks() {
+    const container = document.getElementById('aiTaskList');
+    if (!container) return;
+
+    container.innerHTML = SANO_DATA.aiAgentTasks.map((section, si) => {
+        const sectionStatus = section.status;
+        const statusBadge = sectionStatus === 'running' ? '<span class="ai-section-badge running">Running</span>' :
+                           sectionStatus === 'blocked' ? '<span class="ai-section-badge blocked">Blocked</span>' : '';
+        const completedCount = section.tasks.filter(t => t.status === 'complete').length;
+
+        const tasksHtml = section.tasks.map((t, ti) => {
+            const statusCls = t.status === 'running' ? 'ai-running' : t.status === 'complete' ? 'ai-complete' :
+                             t.status === 'blocked' ? 'ai-blocked' : 'ai-queued';
+            const statusIcon = t.status === 'running' ? '◉' : t.status === 'complete' ? '✓' :
+                              t.status === 'blocked' ? '🔒' : '○';
+            const costTag = t.estCost > 0 ? `<span class="ai-cost">$${t.estCost.toFixed(2)}</span>` : '';
+            return `
+                <div class="ai-task-item ${statusCls}" onclick="cycleAITask(${si}, ${ti})">
+                    <span class="ai-task-status">${statusIcon}</span>
+                    <span class="ai-task-text">${t.text}</span>
+                    <span class="ai-agent-tag">${t.agent}</span>
+                    ${costTag}
+                </div>`;
+        }).join('');
+
+        return `
+            <div class="ai-section">
+                <div class="ai-section-header" onclick="toggleAISection(${si})">
+                    <span class="ai-section-title">${section.section}</span>
+                    ${statusBadge}
+                    <span class="ai-section-count">${completedCount}/${section.tasks.length}</span>
+                </div>
+                <div class="ai-section-tasks" id="ai-section-${si}">${tasksHtml}</div>
+            </div>`;
+    }).join('');
+}
+
+function toggleAISection(si) {
+    document.getElementById(`ai-section-${si}`)?.classList.toggle('collapsed');
+}
+
+function cycleAITask(si, ti) {
+    const task = SANO_DATA.aiAgentTasks[si].tasks[ti];
+    const order = ['queued', 'running', 'complete'];
+    if (task.status === 'blocked') return;
+    task.status = order[(order.indexOf(task.status) + 1) % order.length];
+    renderAITasks();
+    updateTabCounts();
+    saveData();
+}
+
+/* ===================== COST BREAKDOWN ===================== */
+function renderCostBreakdown() {
+    const container = document.getElementById('costBreakdown');
+    if (!container || !SANO_DATA.agentCosts) return;
+
+    const ac = SANO_DATA.agentCosts;
+    const tableRows = ac.perAgent.map(a => `
+        <tr>
+            <td>${a.agent}</td>
+            <td>${a.calls}</td>
+            <td>$${a.spent.toFixed(2)}</td>
+            <td>${a.model}</td>
+        </tr>
+    `).join('');
+
+    const totalSpent = ac.perAgent.reduce((s, a) => s + a.spent, 0);
+    const totalCalls = ac.perAgent.reduce((s, a) => s + a.calls, 0);
+
+    container.innerHTML = `
+        <h3>Agent Cost Breakdown</h3>
+        <table class="cost-table">
+            <thead><tr><th>Agent</th><th>Calls</th><th>Spent</th><th>Model</th></tr></thead>
+            <tbody>${tableRows}</tbody>
+            <tfoot><tr><td><strong>Total</strong></td><td><strong>${totalCalls}</strong></td><td><strong>$${totalSpent.toFixed(2)}</strong></td><td></td></tr></tfoot>
+        </table>
+    `;
+
+    // 7-day bar chart
+    const chartContainer = document.getElementById('spendChartCard');
+    if (chartContainer && ac.dailySpend) {
+        const maxSpend = Math.max(...ac.dailySpend.map(d => d.amount), 1);
+        const bars = ac.dailySpend.map(d => {
+            const heightPct = (d.amount / maxSpend) * 100;
+            return `
+                <div class="spend-bar-col">
+                    <div class="spend-bar" style="height: ${Math.max(heightPct, 2)}%"></div>
+                    <span class="spend-bar-label">${d.date.replace('Apr ', '')}</span>
+                    <span class="spend-bar-value">$${d.amount.toFixed(2)}</span>
+                </div>`;
+        }).join('');
+        chartContainer.innerHTML = `<h3>7-Day Agent Spend</h3><div class="spend-bars">${bars}</div>`;
+    }
+}
+
+/* ===================== DECISION JOURNAL ===================== */
+function renderDecisions() {
+    const container = document.getElementById('decisionList');
+    const filtersEl = document.getElementById('decisionFilters');
+    if (!container || !SANO_DATA.decisions) return;
+
+    // Get unique categories
+    const categories = [...new Set(SANO_DATA.decisions.map(d => d.category))];
+    if (filtersEl) {
+        filtersEl.innerHTML = `<button class="decision-chip active" onclick="filterDecisions('all')">All</button>` +
+            categories.map(c => `<button class="decision-chip" onclick="filterDecisions('${c}')">${c}</button>`).join('');
+    }
+
+    renderDecisionEntries('all');
+}
+
+function filterDecisions(category) {
+    document.querySelectorAll('.decision-chip').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    renderDecisionEntries(category);
+}
+
+function renderDecisionEntries(category) {
+    const container = document.getElementById('decisionList');
+    if (!container) return;
+    const filtered = category === 'all' ? SANO_DATA.decisions : SANO_DATA.decisions.filter(d => d.category === category);
+    container.innerHTML = filtered.map((d, i) => `
+        <div class="decision-entry" onclick="this.classList.toggle('expanded')">
+            <div class="decision-row">
+                <span class="decision-date">${d.date}</span>
+                <span class="decision-title">${d.title}</span>
+                <span class="decision-cat">${d.category}</span>
+            </div>
+            <div class="decision-reasoning">${d.reasoning}</div>
+        </div>
+    `).join('');
+}
+
+/* ===================== AGENT FEED ===================== */
 function renderAgentFeed() {
     const container = document.getElementById('agentFeed');
     if (!container) return;
@@ -165,10 +485,8 @@ function renderAgentFeed() {
         return;
     }
     container.innerHTML = SANO_DATA.agentReports.map(r => {
-        const statusCls = r.status === 'complete' ? 'status-complete' :
-                          r.status === 'running' ? 'status-running' : 'status-failed';
-        const statusIcon = r.status === 'complete' ? '✓' :
-                           r.status === 'running' ? '•••' : '✗';
+        const statusCls = r.status === 'complete' ? 'status-complete' : r.status === 'running' ? 'status-running' : 'status-failed';
+        const statusIcon = r.status === 'complete' ? '✓' : r.status === 'running' ? '•••' : '✗';
         return `
         <div class="agent-report">
             <div class="agent-report-header">
@@ -177,98 +495,47 @@ function renderAgentFeed() {
             </div>
             <div class="agent-message">${r.message}</div>
             ${r.file ? `<span class="agent-file-link">${r.file}</span>` : ''}
-            <button class="comment-btn-sm" onclick="openComment('agent-report', '${r.agent} report')" title="Leave feedback">···</button>
         </div>`;
     }).join('');
 }
 
-/* --- Checklist --- */
-function renderChecklist() {
-    const container = document.getElementById('checklistSections');
-    if (!container) return;
-    container.innerHTML = SANO_DATA.checklist.map((section, si) => {
-        const total = section.items.length;
-        const done = section.items.filter(i => i.status === 'done').length;
-        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-        const items = section.items.map((item, ii) => {
-            const icon = item.status === 'done' ? '✓' : item.status === 'in-progress' ? '•' : '‒';
-            const cls = item.status === 'done' ? 'done' : '';
-            return `<div class="checklist-item ${cls}" onclick="cycleStatus(${si},${ii})">
-                <span class="check-icon">${icon}</span>
-                <span>${item.text}</span>
-                <button class="comment-btn-sm" onclick="event.stopPropagation(); openComment('task', '${item.text.replace(/'/g, "\\'")}')" title="Comment">···</button>
-            </div>`;
-        }).join('');
+/* ===================== INTEL & DOCS ===================== */
+function renderIntelDocs() {
+    const container = document.getElementById('intelList');
+    if (!container || !SANO_DATA.intelDocs) return;
+    container.innerHTML = SANO_DATA.intelDocs.map((cat, ci) => {
+        const docs = cat.docs.map(d => `
+            <div class="intel-doc">
+                <span class="intel-doc-title">${d.title}</span>
+                <span class="intel-doc-file">${d.file}</span>
+            </div>
+        `).join('');
         return `
-            <div class="checklist-section">
-                <div class="checklist-section-header" onclick="toggleChecklist(${si})">
-                    <div style="display:flex;align-items:center;gap:6px">
-                        <span class="checklist-section-title">${section.section}</span>
-                        <span class="week-tag">${section.week}</span>
-                    </div>
-                    <div class="checklist-section-progress">
-                        <div class="mini-progress-bar"><div class="mini-progress-fill" style="width:${pct}%"></div></div>
-                        <span class="checklist-section-percent">${pct}%</span>
-                    </div>
+            <div class="intel-category">
+                <div class="intel-cat-header" onclick="document.getElementById('intel-${ci}').classList.toggle('collapsed')">
+                    <span>${cat.category}</span>
+                    <span class="intel-count">${cat.docs.length}</span>
                 </div>
-                <div class="checklist-items" id="checklist-${si}">${items}</div>
+                <div class="intel-docs" id="intel-${ci}">${docs}</div>
             </div>`;
     }).join('');
 }
 
-function toggleChecklist(i) { document.getElementById(`checklist-${i}`)?.classList.toggle('open'); }
-
-function cycleStatus(si, ii) {
-    const item = SANO_DATA.checklist[si].items[ii];
-    const order = ['not-started', 'in-progress', 'done'];
-    item.status = order[(order.indexOf(item.status) + 1) % 3];
-    renderChecklist();
-    updateProgressStats();
-    saveData();
-}
-
-/* --- Approvals --- */
-function renderApprovals() {
-    const container = document.getElementById('approvalList');
-    const countEl = document.getElementById('approvalCount');
+/* ===================== COMPLETED ===================== */
+function renderCompleted() {
+    const container = document.getElementById('completedList');
     if (!container) return;
-    if (countEl) countEl.textContent = SANO_DATA.approvals.length;
-    if (!SANO_DATA.approvals.length) {
-        container.innerHTML = '<div class="empty-state">All caught up.</div>';
-        return;
-    }
-    container.innerHTML = SANO_DATA.approvals.map((a, i) => `
-        <div class="approval-item" id="approval-${i}">
-            <div class="approval-title">${a.title}</div>
-            <div class="approval-desc">${a.description}</div>
-            <div class="approval-actions">
-                <button class="btn-approve" onclick="handleApproval(${i}, 'approved')">Approve</button>
-                <button class="btn-review" onclick="openComment('approval', '${a.title.replace(/'/g, "\\'")}')">Comment</button>
-                <button class="btn-reject" onclick="handleApproval(${i}, 'rejected')">Reject</button>
-            </div>
-        </div>`).join('');
+    const completedItems = SANO_DATA.priorities.filter(p => p.done);
+    container.innerHTML = completedItems.map(p => `
+        <div class="completed-item">
+            <span class="completed-check">✓</span>
+            <span class="completed-text">${p.text}</span>
+            ${p.steps && p.steps[0] ? `<span class="completed-date">${p.steps[0].replace('✅ ', '')}</span>` : ''}
+        </div>
+    `).join('');
 }
 
-function handleApproval(index, decision) {
-    const item = SANO_DATA.approvals[index];
-    const el = document.getElementById(`approval-${index}`);
-    SANO_DATA.comments.push({
-        id: `decision-${Date.now()}`,
-        target: item.title,
-        text: `CEO Decision: ${decision.toUpperCase()}`,
-        timestamp: new Date().toLocaleString(),
-        type: 'decision'
-    });
-    if (el) { el.style.opacity = '0.3'; }
-    setTimeout(() => {
-        SANO_DATA.approvals.splice(index, 1);
-        renderApprovals();
-        renderComments();
-        saveData();
-    }, 600);
-}
-
-/* --- Comment System --- */
+/* ===================== COMMENT SYSTEM ===================== */
 function openComment(type, target) {
     const modal = document.getElementById('commentModal');
     const input = document.getElementById('commentInput');
@@ -280,11 +547,6 @@ function openComment(type, target) {
     input.value = '';
     modal.classList.add('open');
     input.focus();
-    const keyHandler = (e) => {
-        if (e.key === 'Escape') { closeComment(); document.removeEventListener('keydown', keyHandler); }
-        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { submitComment(); document.removeEventListener('keydown', keyHandler); }
-    };
-    document.addEventListener('keydown', keyHandler);
 }
 
 function closeComment() { document.getElementById('commentModal')?.classList.remove('open'); }
@@ -301,113 +563,13 @@ function submitComment() {
         timestamp: new Date().toLocaleString(),
     });
     closeComment();
-    renderComments();
     saveData();
-    showToast(`Note saved: "${modal.dataset.target}"`);
+    showToast(`Note saved`);
 }
 
-function renderComments() {
-    const container = document.getElementById('commentFeed');
-    const countEl = document.getElementById('commentCount');
-    if (!container) return;
-    if (countEl) countEl.textContent = SANO_DATA.comments.length;
-    if (!SANO_DATA.comments.length) {
-        container.innerHTML = '<div class="empty-state">No notes yet.</div>';
-        return;
-    }
-    container.innerHTML = SANO_DATA.comments.slice(0, 20).map(c => {
-        const label = c.type === 'decision' ? 'DECISION' : 'NOTE';
-        const cls = c.type === 'decision' ? 'comment-decision' : '';
-        return `
-        <div class="comment-item ${cls}">
-            <div class="comment-header">
-                <span>${label} — <strong>${c.target}</strong></span>
-                <span class="comment-time">${c.timestamp}</span>
-            </div>
-            <div class="comment-text">${c.text}</div>
-        </div>`;
-    }).join('');
-}
-
-function copyAllComments() {
-    const text = exportComments();
-    navigator.clipboard.writeText(text).then(() => {
-        showToast('Notes copied to clipboard');
-    }).catch(() => {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        showToast('Notes copied');
-    });
-}
-
-/* --- Progress Stats --- */
-function updateProgressStats() {
-    const allItems = SANO_DATA.checklist.flatMap(s => s.items);
-    const total = allItems.length;
-    const done = allItems.filter(i => i.status === 'done').length;
-    const inProgress = allItems.filter(i => i.status === 'in-progress').length;
-    const remaining = total - done - inProgress;
-    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-    setText('overallPercent', `${pct}%`);
-    setText('completedTasks', done);
-    setText('inProgressTasks', inProgress);
-    setText('remainingTasks', remaining);
-    setTimeout(() => {
-        const bar = document.getElementById('overallBar');
-        if (bar) bar.style.width = `${pct}%`;
-    }, 200);
-}
-
-/* --- Budget Tracker (Redesigned) --- */
-function renderBudget() {
-    const budget = SANO_DATA.budget;
-    if (!budget) return;
-
-    const spent = budget.expenses
-        .filter(e => e.status === 'paid')
-        .reduce((sum, e) => sum + e.amount, 0);
-
-    const projected = budget.expenses
-        .reduce((sum, e) => sum + e.amount, 0);
-
-    const remaining = budget.starting - spent;
-    const pctRemaining = Math.round((remaining / budget.starting) * 100);
-
-    // Burn rate: projected total / 8 weeks
-    const burnRate = Math.round(projected / 8);
-    // Runway: remaining / weekly burn rate
-    const runwayWeeks = burnRate > 0 ? Math.round(remaining / burnRate) : 0;
-
-    // Display
-    const amountEl = document.getElementById('budgetRemaining');
-    if (amountEl) {
-        amountEl.textContent = `$${remaining.toLocaleString()}`;
-        amountEl.className = 'health-value budget-remaining-val';
-        if (pctRemaining < 25) amountEl.classList.add('danger');
-        else if (pctRemaining < 50) amountEl.classList.add('caution');
-    }
-
-    // Bar color
-    const barEl = document.getElementById('budgetBar');
-    if (barEl) {
-        barEl.className = 'health-bar-fill budget-bar-fill';
-        if (pctRemaining < 25) barEl.classList.add('danger');
-        else if (pctRemaining < 50) barEl.classList.add('caution');
-        setTimeout(() => { barEl.style.width = `${pctRemaining}%`; }, 200);
-    }
-
-    setText('budgetSpent', `$${spent.toLocaleString()}`);
-    setText('budgetProjected', `$${projected.toLocaleString()}`);
-    setText('budgetBurn', `$${burnRate.toLocaleString()}/wk`);
-    setText('budgetRunway', runwayWeeks > 0 ? `${runwayWeeks} wks` : '—');
-}
-
-/* --- Toast --- */
+/* ===================== UTILITIES ===================== */
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function refreshDashboard() { location.reload(); }
 function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -415,27 +577,4 @@ function showToast(message) {
     document.body.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
     setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
-}
-
-/* --- Utilities --- */
-function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-function refreshDashboard() { location.reload(); }
-
-function scrollToSection(id) {
-    const el = document.getElementById(id);
-    if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        el.classList.add('section-highlight');
-        setTimeout(() => el.classList.remove('section-highlight'), 1500);
-    }
-}
-
-function resetToDefaultData() { localStorage.removeItem(STORAGE_KEY); location.reload(); }
-
-function exportComments() {
-    if (!SANO_DATA.comments || !SANO_DATA.comments.length) return 'No notes yet.';
-    return SANO_DATA.comments.map(c => {
-        const prefix = c.type === 'decision' ? 'DECISION' : 'NOTE';
-        return `${prefix} | ${c.target}\n${c.text}\n(${c.timestamp})\n`;
-    }).join('\n---\n\n');
 }
