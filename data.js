@@ -1,7 +1,7 @@
 /* ============================================
-   SANO COMMAND CENTER — Data Layer v6.0
-   SOURCE OF TRUTH: brain/MASTER_STATE.md
-   Updated: April 11, 2026
+   SANO COMMAND CENTER — Data Layer v8.0
+   SOURCE OF TRUTH: brain/v2/BOOT.md + TASKS.jsonl
+   Updated: April 15, 2026
    Architecture: AI-First (75-80% automation)
    ============================================ */
 
@@ -9,6 +9,27 @@ const SANO_DATA = {
 
     // ---- Launch Date ----
     launchDate: new Date('2026-06-01T08:00:00-05:00'),
+    projectStartDate: '2026-04-04',
+
+    // ---- Agent Registry ----
+    agentRegistry: [
+        { id: 'antigravity', name: 'Antigravity', role: 'Co-founder AI (strategy, code, ops)', icon: '🧠' },
+        { id: 'openclaw', name: 'OpenClaw', role: 'Builder agent (drafts, research, content)', icon: '🐙' },
+        { id: 'sentinel', name: 'Sentinel', role: 'Monitor agent (QA, alerts, compliance)', icon: '🛡️' },
+    ],
+
+    // ---- Streak Config ----
+    streakConfig: {
+        freezesPerWeek: 2,  // 2 days/week you can skip without breaking streak
+        freezesUsedThisWeek: 0,
+        weekStartsOn: 'monday',
+    },
+
+    // ---- Today's Focus Pins (manual overrides) ----
+    focusPins: {
+        jasper: [],  // array of task IDs manually pinned to focus
+        ai: [],      // array of task IDs manually pinned to focus
+    },
 
     // ---- Financial Dashboard ----
     budget: {
@@ -21,7 +42,7 @@ const SANO_DATA = {
             preChris: '33+ months',
             withChris: '3.5 months',
         },
-        breakEven: '3 Starter clients ($249 × 3 = $747 > $552 burn)',
+        breakEven: '2 Starter clients ($397 × 2 = $794 > $572 burn)',
         expenses: [
             // Already paid
             { id: 'exp-1', item: 'LLC Registration — Texas SOS', amount: 300, status: 'paid', week: 0, category: 'legal' },
@@ -32,9 +53,9 @@ const SANO_DATA = {
             { id: 'exp-6', item: 'Agent API costs (testing)', amount: 5, status: 'paid', week: 0, category: 'agents' },
 
             // Week 1 — This week
-            { id: 'exp-7', item: 'GHL SaaS Pro (Month 1)', amount: 497, status: 'pending', week: 1, category: 'platform' },
+            { id: 'exp-7', item: 'GHL SaaS Pro (Month 1)', amount: 497, status: 'paid', week: 1, category: 'platform' },
             { id: 'exp-8', item: 'HVAC Snapshot purchase', amount: 100, status: 'pending', week: 1, category: 'platform' },
-            { id: 'exp-9', item: 'Agent API costs (Week 1)', amount: 5, status: 'pending', week: 1, category: 'agents' },
+            { id: 'exp-9', item: 'Agent API costs (Week 1)', amount: 5, status: 'paid', week: 1, category: 'agents' },
 
             // Week 2-4
             { id: 'exp-10', item: 'Attorney review (MSA + 1099)', amount: 400, status: 'pending', week: 2, category: 'legal' },
@@ -49,19 +70,19 @@ const SANO_DATA = {
         ],
     },
 
-    // ---- Pricing (UPDATED April 11) ----
+    // ---- Pricing (LOCKED April 15 — D-0017 + D-0019) ----
     pricing: {
-        starter: { setup: 1497, monthly: 249, foundingSetup: 997 },
-        growth: { setup: 2497, monthly: 347 },
-        scale: { setup: 4997, monthly: 497 },
-        totalTransformation: { setup: 14997, monthly: 4997 },
+        starter: { setup: 997, monthly: 397, note: 'Entry tier' },
+        growth: { setup: 2497, monthly: 999 },
+        scale: { setup: 4997, monthly: 1995 },
+        totalTransformation: { setup: 14997, monthly: 4997, note: '6-month min, sell after case studies' },
     },
 
     // ---- Tech Stack (AI-First Architecture) ----
     techStack: {
         core: [
-            { name: 'GoHighLevel SaaS Pro', cost: '$497/mo', role: 'CRM, automations, client sub-accounts, AI chatbot, voice AI, social planner', status: 'pending-signup' },
-            { name: 'GHL MCP (Model Context Protocol)', cost: 'Free', role: '269+ tools — Claude controls GHL directly via API', status: 'pending-connection' },
+            { name: 'GoHighLevel SaaS Pro', cost: '$497/mo', role: 'CRM, automations, client sub-accounts, AI chatbot, voice AI, social planner', status: 'active' },
+            { name: 'GHL MCP (Model Context Protocol)', cost: 'Free', role: '215 tools — AI controls GHL directly via API (port 8000, auto-restart)', status: 'active' },
             { name: 'Instantly.ai', cost: '$47/mo', role: 'Cold email sending + warmup', status: 'active' },
         ],
         free: [
@@ -96,31 +117,33 @@ const SANO_DATA = {
 
     // ---- Overnight Report (Morning Dashboard Card) ----
     overnightReport: {
-        date: '2026-04-11',
-        status: 'running', // 'running', 'complete', 'failed', 'none'
-        tasksTotal: 6,
-        tasksCompleted: 0,
+        date: '2026-04-15',
+        status: 'complete',
+        tasksTotal: 8,
+        tasksCompleted: 8,
         tasksFailed: 0,
         totalCost: 0,
-        startTime: '9:00 PM',
+        startTime: '11:00 AM',
         deliverables: [
-            { name: 'Client Service Agreement', status: 'running', file: 'client-service-agreement-v1.md' },
-            { name: 'Cold Email Sequences', status: 'queued', file: 'cold-email-sequences-v1.md' },
-            { name: 'Chris 1099 Agreement', status: 'queued', file: 'chris-1099-agreement-v1.md' },
-            { name: 'Competitive Intel', status: 'queued', file: 'competitive-intel-v1.md' },
-            { name: 'Knowledge Base (8 articles)', status: 'queued', file: 'knowledge-base-articles-v1.md' },
-            { name: 'Social Media (15 posts)', status: 'queued', file: 'social-media-batch-v1.md' },
+            { name: 'v2 Memory Scaffold installed (BOOT + TASKS + DECISIONS + CHANGELOG)', status: 'complete', file: 'brain/v2/BOOT.md' },
+            { name: 'Pricing locked at 4 tiers (D-0017/D-0019)', status: 'complete', file: 'brain/v2/IDENTITY.md' },
+            { name: 'MSA draft reviewed by CEO (5 flags addressed)', status: 'complete', file: 'agent-output/legal/client-service-agreement-draft.md' },
+            { name: 'Chris 1099 Agreement draft complete', status: 'complete', file: 'agent-output/legal/chris-1099-agreement-draft.md' },
+            { name: 'Knowledge Base FAQ (8 articles) drafted', status: 'complete', file: 'agent-output/training/knowledge-base-faq-v1.md' },
+            { name: 'Social Media batch (15 posts + calendar) drafted', status: 'complete', file: 'agent-output/drafts/social-media-batch-v1.md' },
+            { name: 'SMS/Voice cap research + pricing recommendation', status: 'complete', file: 'msa_review.md' },
+            { name: 'Command Center data sync to v2 brain', status: 'complete', file: 'command-center/data.js' },
         ],
     },
 
     // ---- CEO Directive Status ----
     directive: {
         active: true,
-        date: '2026-04-11',
-        taskCount: 6,
+        date: '2026-04-15',
+        taskCount: 3,
         source: 'Antigravity session',
         approvedBy: 'CEO',
-        estimatedCost: 3.30,
+        estimatedCost: 0,
     },
 
     // ---- Agent Spend Tracking (ENHANCED — Feature 2) ----
@@ -147,28 +170,45 @@ const SANO_DATA = {
     // ---- Agent Activity Feed ----
     agentReports: [
         {
+            agent: 'Antigravity',
+            time: '2:40 PM — Apr 15',
+            message: '📋 MSA REVIEW SESSION. CEO reviewed Client Service Agreement draft. 5 review flags addressed: LLC (deferred to pre-launch), founding rate (removed from MSA), SMS/voice caps (researched — industry benchmarks applied), add-on packages (à la carte vs bundle structure proposed), early termination (kept as-is for attorney). Ready for attorney submission.',
+            status: 'complete'
+        },
+        {
+            agent: 'Antigravity',
+            time: '1:30 PM — Apr 15',
+            message: '🧠 v2 MEMORY SCAFFOLD INSTALLED. BOOT.md, TASKS.jsonl (34 tasks), DECISIONS.jsonl (20 decisions), CHANGELOG.jsonl, PROTOCOL.md, drift-detector.py all live in brain/v2/. Dual-read phase active. KI bundle installed in Antigravity.',
+            status: 'complete'
+        },
+        {
+            agent: 'Antigravity',
+            time: '12:00 PM — Apr 15',
+            message: '💰 PRICING LOCKED (D-0017 + D-0019). 4 tiers final: Starter $997+$397, Growth $2,497+$999, Scale $4,997+$1,995, Total Transformation $14,997+$4,997. All brain files, MSA, and Command Center updated.',
+            status: 'complete'
+        },
+        {
+            agent: 'OpenClaw',
+            time: '11:00 AM — Apr 15',
+            message: '📝 6 AGENT DRAFTS DELIVERED. MSA ✅, Chris 1099 ✅, Cold emails ✅, Competitive intel ✅, Knowledge Base (8 FAQ) ✅, Social media (15 posts + calendar) ✅. All awaiting CEO review.',
+            status: 'complete'
+        },
+        {
+            agent: 'Antigravity',
+            time: '6:00 PM — Apr 14',
+            message: '🎉 GHL DAY 1 COMPLETE. Jasper finished curriculum Day 1: 6 custom fields, pipeline (7 stages), Mike Thompson + Sarah Chen contacts, ProFlow Plumbing deal at Qualified ($999/mo). Day 2 (Workflow Builder) in progress.',
+            status: 'complete'
+        },
+        {
+            agent: 'Antigravity',
+            time: '4:00 PM — Apr 13',
+            message: '🔌 GHL MCP SERVER DEPLOYED. 215 tools on port 8000 (launchd auto-restart). API verified: contacts ✅, pipelines ✅, calendars ✅, workflows ✅, opportunities ✅.',
+            status: 'complete'
+        },
+        {
             agent: 'Pipeline',
             time: '9:00 PM — Apr 11',
-            message: '🚀 Night pipeline LAUNCHED with CEO Directive. 6 tasks queued: MSA, Cold Email Sequences, Chris 1099, Competitive Intel, Knowledge Base (8 articles), Social Media (15 posts). Pre-approved, running now.',
-            status: 'running'
-        },
-        {
-            agent: 'Antigravity',
-            time: '8:30 PM — Apr 11',
-            message: '🔄 MAJOR RESTRUCTURE: 6-phase research complete. VA eliminated ($850/mo saved). Monthly burn: $1,544 → $552. Runway: 12mo → 33mo. GHL MCP discovered (269+ tools). AI automation: 20% → 75-80%. Master launch plan built. All research saved to docs/research/.',
-            status: 'complete'
-        },
-        {
-            agent: 'Builder',
-            time: '6:45 PM — Apr 11',
-            message: '✅ Test run successful — positioning statement produced in 18 seconds, $0.08. Pipeline verified working after 4-bug fix.',
-            status: 'complete'
-        },
-        {
-            agent: 'Antigravity',
-            time: '6:00 PM — Apr 11',
-
-message: '🔧 Agent pipeline repaired: fixed dry-run passthrough, exit code capture, Python syntax error in post-call.sh, function ordering. Builder agent verified. Pipeline ready for production.',
+            message: '🚀 Night pipeline LAUNCHED with CEO Directive. 6 tasks queued.',
             status: 'complete'
         },
     ],
@@ -181,17 +221,17 @@ message: '🔧 Agent pipeline repaired: fixed dry-run passthrough, exit code cap
             section: '🔴 This Weekend (Apr 12-13)',
             description: 'GHL signup + tools setup',
             items: [
-                { id: 'j-1', text: 'Install Scribe Chrome extension', status: 'not-started', time: '2 min', day: 'Sat' },
-                { id: 'j-2', text: 'Install Instant Data Scraper Chrome extension', status: 'not-started', time: '2 min', day: 'Sat' },
+                { id: 'j-1', text: 'Install Scribe Chrome extension', status: 'complete', time: '2 min', day: 'Mon' },
+                { id: 'j-2', text: 'Install Instant Data Scraper Chrome extension', status: 'complete', time: '2 min', day: 'Mon' },
                 { id: 'j-3', text: 'Sign up Wave accounting (free)', status: 'not-started', time: '10 min', day: 'Sat' },
-                { id: 'j-4', text: 'Sign up GHL SaaS Pro ($497/mo)', status: 'not-started', time: '5 min', day: 'Sat' },
-                { id: 'j-5', text: 'Create Private Integration Token in GHL', status: 'not-started', time: '10 min', day: 'Sat' },
-                { id: 'j-6', text: 'Get Location ID → send to Antigravity', status: 'not-started', time: '2 min', day: 'Sat' },
+                { id: 'j-4', text: 'Sign up GHL SaaS Pro ($497/mo)', status: 'complete', time: '5 min', day: 'Sat' },
+                { id: 'j-5', text: 'Create Private Integration Token in GHL', status: 'complete', time: '10 min', day: 'Sat' },
+                { id: 'j-6', text: 'Get Location ID → send to Antigravity', status: 'complete', time: '2 min', day: 'Sat' },
                 { id: 'j-7', text: 'Create sandbox sub-account: SANO-Sandbox-HVAC', status: 'not-started', time: '5 min', day: 'Sat' },
-                { id: 'j-8', text: 'GHL Learning Session #1 — Dashboard tour (Scribe ON)', status: 'not-started', time: '45 min', day: 'Sat' },
+                { id: 'j-8', text: 'GHL Day 1 — Settings + Custom Fields + Pipeline + Contacts', status: 'complete', time: '2.5 hrs', day: 'Mon' },
                 { id: 'j-9', text: 'Set up Visualping — monitor 5 competitor pricing pages', status: 'not-started', time: '15 min', day: 'Sat' },
                 { id: 'j-10', text: 'Set up Google Alerts — 3 competitor names', status: 'not-started', time: '3 min', day: 'Sat' },
-                { id: 'j-11', text: 'GHL Learning Session #2 — Sub-accounts + Snapshots (Scribe ON)', status: 'not-started', time: '45 min', day: 'Sun' },
+                { id: 'j-11', text: 'GHL Day 2 — Workflow Builder (Welcome + Proposal sequences)', status: 'complete', time: '3 hrs', day: 'Mon' },
                 { id: 'j-12', text: 'Browse GHL Snapshot Marketplace — find HVAC/plumbing snaps', status: 'not-started', time: '45 min', day: 'Sun' },
             ]
         },
@@ -216,11 +256,10 @@ message: '🔧 Agent pipeline repaired: fixed dry-run passthrough, exit code cap
             section: '🟢 End of Week Reviews',
             description: 'Review agent work + legal',
             items: [
-                { id: 'j-24', text: 'Review agent-drafted Client Service Agreement', status: 'not-started', time: '20 min', day: 'Sun' },
-                { id: 'j-25', text: 'Review agent-drafted Cold Email Sequences', status: 'not-started', time: '15 min', day: 'Mon' },
-                { id: 'j-26', text: 'Review agent Competitive Intel Report', status: 'not-started', time: '20 min', day: 'Tue' },
-
-{ id: 'j-27', text: 'Review agent-drafted Chris 1099 Agreement', status: 'not-started', time: '20 min', day: 'Wed' },
+                { id: 'j-24', text: 'Review agent-drafted Client Service Agreement', status: 'in-progress', time: '20 min', day: 'Tue' },
+                { id: 'j-25', text: 'Review agent-drafted Cold Email Sequences', status: 'not-started', time: '15 min', day: 'Wed' },
+                { id: 'j-26', text: 'Review agent Competitive Intel Report', status: 'not-started', time: '20 min', day: 'Wed' },
+                { id: 'j-27', text: 'Review agent-drafted Chris 1099 Agreement', status: 'not-started', time: '20 min', day: 'Thu' },
                 { id: 'j-28', text: 'Review agent Knowledge Base articles', status: 'not-started', time: '15 min', day: 'Thu' },
                 { id: 'j-29', text: 'Review agent Social Media batch', status: 'not-started', time: '15 min', day: 'Fri' },
                 { id: 'j-30', text: 'Send legal drafts (MSA + 1099) to attorney', status: 'not-started', time: '15 min', day: 'Fri' },
@@ -276,7 +315,7 @@ description: 'Cold email live + first responses',
             items: [
                 { id: 'j-70', text: 'Final warmup verification (Day 33)', status: 'not-started', time: '15 min', day: '' },
                 { id: 'j-71', text: 'LAUNCH cold email campaign', status: 'not-started', time: '30 min', day: '' },
-                { id: 'j-72', text: 'Post founding member announcement on social', status: 'not-started', time: '30 min', day: '' },
+                { id: 'j-72', text: 'Post early access announcement on social', status: 'not-started', time: '30 min', day: '' },
                 { id: 'j-73', text: 'Monitor replies daily (AM + PM)', status: 'not-started', time: '30 min/day', day: '' },
                 { id: 'j-74', text: 'Respond to interested prospects', status: 'not-started', time: '1-3 hrs', day: '' },
                 { id: 'j-75', text: 'Scrape second lead list: 50 plumbing companies', status: 'not-started', time: '1 hr', day: '' },
@@ -314,20 +353,23 @@ description: 'Cold email live + first responses',
             section: '🔴 Tonight (Apr 11) — Running NOW',
             description: 'Pipeline executing 6 pre-approved tasks',
             items: [
-                { id: 'ai-1', text: 'Draft Client Service Agreement (MSA)', status: 'running', agent: 'Builder', cost: '$0.50' },
-                { id: 'ai-2', text: 'Write Cold Email Sequences (HVAC + Plumber)', status: 'queued', agent: 'Builder', cost: '$0.50' },
-                { id: 'ai-3', text: 'Draft Chris 1099 Agreement', status: 'queued', agent: 'Builder', cost: '$0.40' },
-                { id: 'ai-4', text: 'Competitive Intel Report — Houston market', status: 'queued', agent: 'Builder', cost: '$0.75' },
-                { id: 'ai-5', text: 'Knowledge Base articles (8 FAQ articles)', status: 'queued', agent: 'Builder', cost: '$0.40' },
-                { id: 'ai-6', text: 'Social Media batch (15 posts + calendar)', status: 'queued', agent: 'Builder', cost: '$0.30' },
+                { id: 'ai-1', text: 'Draft Client Service Agreement (MSA)', status: 'complete', agent: 'Builder', cost: '$0.50' },
+                { id: 'ai-2', text: 'Write Cold Email Sequences (HVAC + Plumber)', status: 'complete', agent: 'Builder', cost: '$0.50' },
+                { id: 'ai-3', text: 'Draft Chris 1099 Agreement', status: 'complete', agent: 'Builder', cost: '$0.40' },
+                { id: 'ai-4', text: 'Competitive Intel Report — Houston market', status: 'complete', agent: 'Builder', cost: '$0.75' },
+                { id: 'ai-5', text: 'Knowledge Base articles (8 FAQ articles)', status: 'complete', agent: 'Builder', cost: '$0.40' },
+                { id: 'ai-6', text: 'Social Media batch (15 posts + calendar)', status: 'complete', agent: 'Builder', cost: '$0.30' },
             ]
         },
         {
             section: '🟡 Week 1 — After GHL Connected',
             description: 'Tasks that unlock once MCP is live',
             items: [
-                { id: 'ai-10', text: 'Configure GHL MCP in OpenClaw', status: 'not-started', agent: 'Antigravity', cost: '$0' },
-                { id: 'ai-11', text: 'Test MCP connection — pull pipelines, contacts', status: 'not-started', agent: 'Antigravity', cost: '$0' },
+                { id: 'ai-10', text: 'Configure GHL MCP server (clone, build, deploy)', status: 'complete', agent: 'Antigravity', cost: '$0' },
+                { id: 'ai-11', text: 'Test MCP connection — 215 tools verified, full CRUD confirmed', status: 'complete', agent: 'Antigravity', cost: '$0' },
+                { id: 'ai-11b', text: 'Configure Claude Desktop MCP + launchd auto-restart', status: 'complete', agent: 'Antigravity', cost: '$0' },
+                { id: 'ai-11c', text: 'Create GHL learning curriculum (7-day, SANO-specific)', status: 'complete', agent: 'Antigravity', cost: '$0' },
+                { id: 'ai-11d', text: 'GHL capability report + AI vs human gap analysis', status: 'complete', agent: 'Antigravity', cost: '$0' },
                 { id: 'ai-12', text: 'Sentinel: monitor DNS health for email domains', status: 'in-progress', agent: 'Sentinel', cost: '~$0.10/wk' },
                 { id: 'ai-13', text: 'Morning briefings via Telegram (daily)', status: 'in-progress', agent: 'Chief of Staff', cost: '~$0.05/day' },
             ]
@@ -340,7 +382,7 @@ items: [
                 { id: 'ai-20', text: 'Generate onboarding intake form questions', status: 'not-started', agent: 'Antigravity', cost: '$0' },
                 { id: 'ai-21', text: 'Build welcome email sequence (5 emails)', status: 'not-started', agent: 'Builder', cost: '$0.30' },
                 { id: 'ai-22', text: 'Draft voice agent scripts (per tier)', status: 'not-started', agent: 'Builder', cost: '$0.25' },
-                { id: 'ai-23', text: 'Write founding member outreach email', status: 'not-started', agent: 'Builder', cost: '$0.15' },
+                { id: 'ai-23', text: 'Write early access outreach email', status: 'not-started', agent: 'Builder', cost: '$0.15' },
                 { id: 'ai-24', text: 'Generate monthly report template', status: 'not-started', agent: 'Builder', cost: '$0.15' },
                 { id: 'ai-25', text: 'Social media batch Week 2 (10 posts)', status: 'not-started', agent: 'Builder', cost: '$0.20' },
             ]
@@ -353,7 +395,7 @@ items: [
                 { id: 'ai-31', text: 'Generate proposal template content', status: 'not-started', agent: 'Builder', cost: '$0.20' },
                 { id: 'ai-32', text: 'Write 5 more knowledge base articles', status: 'not-started', agent: 'Builder', cost: '$0.25' },
                 { id: 'ai-33', text: 'Create case study template', status: 'not-started', agent: 'Builder', cost: '$0.15' },
-                { id: 'ai-34', text: 'Draft founding member landing page copy', status: 'not-started', agent: 'Builder', cost: '$0.20' },
+                { id: 'ai-34', text: 'Draft early access landing page copy', status: 'not-started', agent: 'Builder', cost: '$0.20' },
                 { id: 'ai-35', text: 'Weekly business review #1', status: 'not-started', agent: 'Builder', cost: '$0.15' },
             ]
         },
@@ -393,8 +435,7 @@ items: [
     ],
 
     // ---- Already Completed ----
-
-completed: [
+    completed: [
         { text: 'LLC registered — Texas SOS', date: 'Apr 4' },
         { text: 'EIN obtained — IRS.gov', date: 'Apr 4' },
         { text: '4-tier pricing structure finalized', date: 'Apr 5' },
@@ -419,6 +460,35 @@ completed: [
         { text: 'AI-first 8-week master plan created', date: 'Apr 11' },
         { text: 'CEO Directive system built into pipeline', date: 'Apr 11' },
         { text: 'Overnight agent dynamic proposal system designed', date: 'Apr 11' },
+        { text: 'GHL SaaS Pro purchased + account configured', date: 'Apr 13' },
+        { text: 'GHL Private Integration Token + Location ID connected', date: 'Apr 13' },
+        { text: 'GHL MCP server deployed (215 tools, port 8000, launchd auto-restart)', date: 'Apr 13' },
+        { text: 'Claude Desktop MCP wired to GHL', date: 'Apr 13' },
+        { text: 'GHL API full read/write verified (12-step integration test)', date: 'Apr 13' },
+        { text: 'GHL capability report + AI vs Human gap analysis', date: 'Apr 13' },
+        { text: '7-day GHL learning curriculum (SANO-specific) created', date: 'Apr 13' },
+        { text: 'GHL Day 1: 6 custom fields, pipeline (7 stages), 8 contacts, 6 deals', date: 'Apr 14' },
+        { text: 'GHL Day 2: Workflow Builder (Welcome + Proposal sequences)', date: 'Apr 14' },
+        { text: 'Scribe Chrome extension installed — auto-SOP capture ready', date: 'Apr 14' },
+        { text: 'Instant Data Scraper installed — lead scraping ready', date: 'Apr 14' },
+        { text: '8-Week Launch Plan tracker built into Command Center', date: 'Apr 14' },
+        { text: 'GHL mechanic custom fields created (Vehicle Info, License Plate, etc.)', date: 'Apr 14' },
+        { text: 'Beta test contact: Marcus Rodriguez — Rodriguez Auto Repair', date: 'Apr 14' },
+        { text: 'GHL API access reference documented — all tokens, IDs, capabilities saved', date: 'Apr 14' },
+        { text: 'GHL "SANO Full Access" Private Integration created (141/141 scopes)', date: 'Apr 14' },
+        // Apr 15 — today
+        { text: '💰 Pricing LOCKED at 4 tiers: Starter/Growth/Scale/TT (D-0017, D-0019)', date: 'Apr 15' },
+        { text: '🧠 v2 Memory Scaffold installed (BOOT + TASKS + DECISIONS + CHANGELOG)', date: 'Apr 15' },
+        { text: '📄 MSA draft — CEO review session (5 flags addressed)', date: 'Apr 15' },
+        { text: '📄 Chris 1099 Agreement draft completed by agent', date: 'Apr 15' },
+        { text: '📧 Cold email sequence v1 drafted (5 emails)', date: 'Apr 15' },
+        { text: '🔬 Competitive intel Sprint 01 report complete', date: 'Apr 15' },
+        { text: '📚 Knowledge Base FAQ v1 drafted (8 articles)', date: 'Apr 15' },
+        { text: '📱 Social media batch v1 drafted (15 posts + calendar)', date: 'Apr 15' },
+        { text: '💬 SMS/Voice cap research — industry benchmarks established', date: 'Apr 15' },
+        { text: '📊 Command Center data synced to v2 brain source of truth', date: 'Apr 15' },
+        { text: 'Antigravity Knowledge Item (sano-v2-protocol) installed', date: 'Apr 15' },
+        { text: 'Cross-agent write safety protocol added (D-0020)', date: 'Apr 15' },
     ],
 
     // ---- Approvals Queue ----
@@ -426,6 +496,283 @@ completed: [
 
     // ---- CEO Comments ----
     comments: [],
+
+    // ======================================================
+    // 🗺️ 8-WEEK LAUNCH PLAN — Strategic Tracker
+    // Source: docs/strategy/master-launch-plan.md
+    // ======================================================
+    launchPlan: [
+        {
+            week: 1, name: 'FOUNDATION', theme: 'Get the Engine Running',
+            dates: 'Apr 12-18', dateStart: '2026-04-12', dateEnd: '2026-04-18',
+            status: 'active',
+            budget: { estimated: 547, actual: 502 },
+            estHours: { jasper: '8-10', agent: '6-8' },
+            jasperTasks: [
+                { id: 'lp-j-1-1', text: 'Sign up for GHL SaaS Pro ($497/mo)', status: 'done' },
+                { id: 'lp-j-1-2', text: 'Create Private Integration Token', status: 'done' },
+                { id: 'lp-j-1-3', text: 'Get Location ID', status: 'done' },
+                { id: 'lp-j-1-4', text: 'GHL Day 1: Settings + Custom Fields + Pipeline + Contacts', status: 'done' },
+                { id: 'lp-j-1-5', text: 'GHL Day 2: Workflow Builder', status: 'done' },
+                { id: 'lp-j-1-6', text: 'GHL Day 3: SMS/Email Deliverability', status: 'not-started' },
+                { id: 'lp-j-1-7', text: 'GHL Day 4: Calendar + Booking', status: 'not-started' },
+                { id: 'lp-j-1-8', text: 'GHL Day 5: Conversation AI + Reviews AI', status: 'not-started' },
+                { id: 'lp-j-1-9', text: 'GHL Day 6: Voice AI + Social Planner', status: 'not-started' },
+                { id: 'lp-j-1-10', text: 'GHL Day 7: Snapshot Creation + Full Test', status: 'not-started' },
+                { id: 'lp-j-1-11', text: 'Install Scribe + Data Scraper + Wave + Google Alerts', status: 'in-progress' },
+                { id: 'lp-j-1-12', text: 'Browse GHL Snapshot Marketplace', status: 'not-started' },
+            ],
+            agentTasks: [
+                { id: 'lp-a-1-1', text: 'Configure GHL MCP server (215 tools)', agent: 'Antigravity', status: 'done' },
+                { id: 'lp-a-1-2', text: 'Test MCP — full CRUD verified', agent: 'Antigravity', status: 'done' },
+                { id: 'lp-a-1-3', text: 'Claude Desktop MCP + launchd', agent: 'Antigravity', status: 'done' },
+                { id: 'lp-a-1-4', text: 'GHL capability report + gap analysis', agent: 'Antigravity', status: 'done' },
+                { id: 'lp-a-1-5', text: '7-day GHL curriculum created', agent: 'Antigravity', status: 'done' },
+                { id: 'lp-a-1-6', text: 'Competitive intel — Houston agencies', agent: 'Builder', status: 'done' },
+                { id: 'lp-a-1-7', text: 'Draft Client Service Agreement v1', agent: 'Builder', status: 'done' },
+                { id: 'lp-a-1-8', text: 'Cold email sequence v1 (5 emails)', agent: 'Builder', status: 'done' },
+                { id: 'lp-a-1-9', text: '15 social media posts + calendar', agent: 'Builder', status: 'done' },
+                { id: 'lp-a-1-10', text: 'Draft Chris 1099 Agreement', agent: 'Builder', status: 'done' },
+                { id: 'lp-a-1-11', text: 'Knowledge Base FAQ (8 articles)', agent: 'Builder', status: 'done' },
+                { id: 'lp-a-1-12', text: 'Install v2 memory scaffold', agent: 'Antigravity', status: 'done' },
+                { id: 'lp-a-1-13', text: 'SMS/Voice cap industry research', agent: 'Antigravity', status: 'done' },
+            ],
+            gate: [
+                { id: 'lp-g-1-1', text: 'GHL SaaS Pro active', passed: true },
+                { id: 'lp-g-1-2', text: 'MCP connected and verified (215 tools)', passed: true },
+                { id: 'lp-g-1-3', text: 'Scribe + Data Scraper installed', passed: true },
+                { id: 'lp-g-1-4', text: 'GHL 7-day curriculum complete', passed: false },
+                { id: 'lp-g-1-5', text: 'Cold email sequence v1 drafted', passed: true },
+                { id: 'lp-g-1-6', text: 'Client Service Agreement v1 drafted + CEO review started', passed: true },
+                { id: 'lp-g-1-7', text: 'Competitive intel report complete', passed: true },
+                { id: 'lp-g-1-8', text: 'Chris 1099 Agreement v1 drafted', passed: true },
+                { id: 'lp-g-1-9', text: 'Wave accounting set up', passed: false },
+                { id: 'lp-g-1-10', text: 'v2 memory system installed + dual-read active', passed: true },
+                { id: 'lp-g-1-11', text: 'Knowledge Base FAQ drafted (8 articles)', passed: true },
+            ]
+        },
+        {
+            week: 2, name: 'BUILD THE PRODUCT', theme: 'Build Once, Deploy Forever',
+            dates: 'Apr 19-25', dateStart: '2026-04-19', dateEnd: '2026-04-25',
+            status: 'locked',
+            budget: { estimated: 750, actual: 0 },
+            estHours: { jasper: '10-12', agent: '8-10' },
+            jasperTasks: [
+                { id: 'lp-j-2-1', text: 'Purchase best HVAC snapshot ($50-150)', status: 'not-started' },
+                { id: 'lp-j-2-2', text: 'Deploy snapshot to sandbox sub-account', status: 'not-started' },
+                { id: 'lp-j-2-3', text: 'Scribe ON → Walk through entire HVAC snapshot', status: 'not-started' },
+                { id: 'lp-j-2-4', text: 'Review agent-drafted legal agreements', status: 'not-started' },
+                { id: 'lp-j-2-5', text: 'Send legal drafts to TX attorney ($300-500)', status: 'not-started' },
+                { id: 'lp-j-2-6', text: 'Customize HVAC snapshot: brand test (fake client)', status: 'not-started' },
+                { id: 'lp-j-2-7', text: 'Record kickoff call walkthrough (Scribe running)', status: 'not-started' },
+                { id: 'lp-j-2-8', text: 'Build client onboarding intake form in GHL', status: 'not-started' },
+                { id: 'lp-j-2-9', text: 'GHL advanced practice (2 hrs/day)', status: 'not-started' },
+            ],
+            agentTasks: [
+                { id: 'lp-a-2-1', text: 'Generate onboarding intake form questions', agent: 'Antigravity', status: 'not-started' },
+                { id: 'lp-a-2-2', text: 'Build welcome email sequence (5 emails)', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-2-3', text: 'Create 5 knowledge base FAQ articles', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-2-4', text: 'Draft voice agent scripts (per tier)', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-2-5', text: 'Write early access outreach email', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-2-6', text: 'Generate monthly report template', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-2-7', text: 'Social media batch week 2 (10 posts)', agent: 'Builder', status: 'not-started' },
+            ],
+            gate: [
+                { id: 'lp-g-2-1', text: 'HVAC snapshot deployed and tested', passed: false },
+                { id: 'lp-g-2-2', text: 'All automations verified firing', passed: false },
+                { id: 'lp-g-2-3', text: 'Onboarding intake form live', passed: false },
+                { id: 'lp-g-2-4', text: 'Welcome email sequence loaded', passed: false },
+                { id: 'lp-g-2-5', text: 'Legal drafts sent to attorney', passed: false },
+                { id: 'lp-g-2-6', text: '7-day GHL curriculum fully complete', passed: false },
+            ]
+        },
+        {
+            week: 3, name: 'POLISH THE PRODUCT', theme: 'Make It Bulletproof',
+            dates: 'Apr 26 - May 2', dateStart: '2026-04-26', dateEnd: '2026-05-02',
+            status: 'locked',
+            budget: { estimated: 200, actual: 0 },
+            estHours: { jasper: '8-10', agent: '6-8' },
+            jasperTasks: [
+                { id: 'lp-j-3-1', text: 'Snapshot HVAC sub-account → Gold Standard product', status: 'not-started' },
+                { id: 'lp-j-3-2', text: 'Deploy snapshot to fresh account → verify clean', status: 'not-started' },
+                { id: 'lp-j-3-3', text: 'Set up GHL Conversation AI with knowledge base', status: 'not-started' },
+                { id: 'lp-j-3-4', text: 'Set up GHL Reviews AI (auto-pilot)', status: 'not-started' },
+                { id: 'lp-j-3-5', text: 'Record 3 tutorial videos (Guidde/Clueso)', status: 'not-started' },
+                { id: 'lp-j-3-6', text: 'Email warmup check (Day 25)', status: 'not-started' },
+                { id: 'lp-j-3-7', text: 'GHL advanced: workflows + automations (1 hr/day)', status: 'not-started' },
+            ],
+            agentTasks: [
+                { id: 'lp-a-3-1', text: 'Build plumber snapshot (clone + customize)', agent: 'Antigravity', status: 'not-started' },
+                { id: 'lp-a-3-2', text: 'Generate AI proposal template content', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-3-3', text: 'Write 5 more knowledge base articles', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-3-4', text: 'Create case study template', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-3-5', text: 'Social media batch week 3', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-3-6', text: 'Draft early access landing page copy', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-3-7', text: 'Weekly business review #1', agent: 'Builder', status: 'not-started' },
+            ],
+            gate: [
+                { id: 'lp-g-3-1', text: 'Gold-standard snapshot finalized and tested', passed: false },
+                { id: 'lp-g-3-2', text: 'Plumber snapshot v1 ready', passed: false },
+                { id: 'lp-g-3-3', text: 'Conversation AI trained and responding', passed: false },
+                { id: 'lp-g-3-4', text: 'Reviews AI in auto-pilot mode', passed: false },
+                { id: 'lp-g-3-5', text: '3 tutorial videos recorded', passed: false },
+                { id: 'lp-g-3-6', text: 'Knowledge base: 10+ articles', passed: false },
+            ]
+        },
+        {
+            week: 4, name: 'SALES INFRASTRUCTURE', theme: 'Build the Pipeline',
+            dates: 'May 3-9', dateStart: '2026-05-03', dateEnd: '2026-05-09',
+            status: 'locked',
+            budget: { estimated: 500, actual: 0 },
+            estHours: { jasper: '8-10', agent: '5-7' },
+            jasperTasks: [
+                { id: 'lp-j-4-1', text: 'Review attorney feedback on legal agreements', status: 'not-started' },
+                { id: 'lp-j-4-2', text: 'Scrape first lead list: 50 HVAC companies Houston', status: 'not-started' },
+                { id: 'lp-j-4-3', text: 'Review + approve cold email sequences', status: 'not-started' },
+                { id: 'lp-j-4-4', text: 'Load leads into Instantly + configure campaign', status: 'not-started' },
+                { id: 'lp-j-4-5', text: 'Claim Google Business Profile', status: 'not-started' },
+                { id: 'lp-j-4-6', text: 'Set up SANO sales pipeline in GHL', status: 'not-started' },
+                { id: 'lp-j-4-7', text: 'FULL DRY-RUN: fake client end-to-end', status: 'not-started' },
+                { id: 'lp-j-4-8', text: 'GHL advanced: snapshots + reporting (1 hr/day)', status: 'not-started' },
+            ],
+            agentTasks: [
+                { id: 'lp-a-4-1', text: 'Enrich 50 leads with decision-maker info', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-4-2', text: 'Generate personalized first lines (top 20)', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-4-3', text: 'Create SANO sales deck / one-pager', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-4-4', text: 'Social media batch week 4', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-4-5', text: 'Weekly business review #2', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-4-6', text: 'Set up Sentinel GHL health monitoring via MCP', agent: 'Antigravity', status: 'not-started' },
+            ],
+            gate: [
+                { id: 'lp-g-4-1', text: 'Legal agreements finalized by attorney', passed: false },
+                { id: 'lp-g-4-2', text: 'Lead list scraped, enriched, loaded into Instantly', passed: false },
+                { id: 'lp-g-4-3', text: 'Cold email campaign configured (not sent yet)', passed: false },
+                { id: 'lp-g-4-4', text: 'Full end-to-end dry-run passed', passed: false },
+                { id: 'lp-g-4-5', text: 'Google Business Profile claimed', passed: false },
+                { id: 'lp-g-4-6', text: 'Overnight agents producing content nightly', passed: false },
+            ]
+        },
+        {
+            week: 5, name: 'SOFT LAUNCH', theme: 'First Shots Fired',
+            dates: 'May 10-16', dateStart: '2026-05-10', dateEnd: '2026-05-16',
+            status: 'locked',
+            budget: { estimated: 100, actual: 0 },
+            estHours: { jasper: '10-14', agent: '5-7' },
+            jasperTasks: [
+                { id: 'lp-j-5-1', text: 'Final warmup verification (Day 33)', status: 'not-started' },
+                { id: 'lp-j-5-2', text: 'LAUNCH cold email campaign (15-25/day/account)', status: 'not-started' },
+                { id: 'lp-j-5-3', text: 'Post early access announcement on social', status: 'not-started' },
+                { id: 'lp-j-5-4', text: 'Monitor replies daily (AM + PM)', status: 'not-started' },
+                { id: 'lp-j-5-5', text: 'Respond to interested prospects (book calls)', status: 'not-started' },
+                { id: 'lp-j-5-6', text: 'Conduct discovery/sales calls', status: 'not-started' },
+                { id: 'lp-j-5-7', text: 'Scrape second lead list: 50 plumbing companies', status: 'not-started' },
+                { id: 'lp-j-5-8', text: 'Week 1 cold email performance review', status: 'not-started' },
+            ],
+            agentTasks: [
+                { id: 'lp-a-5-1', text: 'Monitor email deliverability metrics', agent: 'Sentinel', status: 'not-started' },
+                { id: 'lp-a-5-2', text: 'A/B test subject line analysis', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-5-3', text: 'Draft follow-up sequences for warm replies', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-5-4', text: 'Generate prospect-specific call prep briefs', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-5-5', text: 'Social media batch week 5', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-5-6', text: 'Weekly business review #3', agent: 'Builder', status: 'not-started' },
+            ],
+            gate: [
+                { id: 'lp-g-5-1', text: 'Cold email live and sending', passed: false },
+                { id: 'lp-g-5-2', text: 'Deliverability > 95%', passed: false },
+                { id: 'lp-g-5-3', text: 'First replies received and responded to', passed: false },
+                { id: 'lp-g-5-4', text: 'At least 1 discovery call booked', passed: false },
+                { id: 'lp-g-5-5', text: 'Second lead list ready', passed: false },
+            ]
+        },
+        {
+            week: 6, name: 'FIRST CLIENT SPRINT', theme: 'Land and Deliver',
+            dates: 'May 17-23', dateStart: '2026-05-17', dateEnd: '2026-05-23',
+            status: 'locked',
+            budget: { estimated: 0, actual: 0 },
+            estHours: { jasper: '10-15', agent: '5-7' },
+            jasperTasks: [
+                { id: 'lp-j-6-1', text: 'Conduct sales calls + send proposals', status: 'not-started' },
+                { id: 'lp-j-6-2', text: '⭐ CLOSE FIRST CLIENT', status: 'not-started' },
+                { id: 'lp-j-6-3', text: 'Deploy first real client sub-account', status: 'not-started' },
+                { id: 'lp-j-6-4', text: 'Conduct first real kickoff call', status: 'not-started' },
+                { id: 'lp-j-6-5', text: 'DNS + Stripe + A2P setup for client', status: 'not-started' },
+                { id: 'lp-j-6-6', text: 'Create first client performance dashboard', status: 'not-started' },
+            ],
+            agentTasks: [
+                { id: 'lp-a-6-1', text: 'Generate proposal for each qualified prospect', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-6-2', text: 'Auto-create sub-account via MCP after close', agent: 'Antigravity', status: 'not-started' },
+                { id: 'lp-a-6-3', text: 'Deploy snapshot + populate client data', agent: 'Antigravity', status: 'not-started' },
+                { id: 'lp-a-6-4', text: 'Post-kickoff: send summary + next steps email', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-6-5', text: 'Social media batch week 6', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-6-6', text: 'First client onboarding QA check', agent: 'Auditor', status: 'not-started' },
+            ],
+            gate: [
+                { id: 'lp-g-6-1', text: 'First paying client closed ($997 setup + $397/mo)', passed: false },
+                { id: 'lp-g-6-2', text: 'Client sub-account live and operational', passed: false },
+                { id: 'lp-g-6-3', text: 'Kickoff call completed', passed: false },
+                { id: 'lp-g-6-4', text: 'All automations verified on real client', passed: false },
+                { id: 'lp-g-6-5', text: 'Client has access to their system', passed: false },
+            ]
+        },
+        {
+            week: 7, name: 'SCALE THE PIPELINE', theme: 'Compound the System',
+            dates: 'May 24-30', dateStart: '2026-05-24', dateEnd: '2026-05-30',
+            status: 'locked',
+            budget: { estimated: 1700, actual: 0 },
+            estHours: { jasper: '10-12', agent: '5-7' },
+            jasperTasks: [
+                { id: 'lp-j-7-1', text: 'Continue sales calls + proposals', status: 'not-started' },
+                { id: 'lp-j-7-2', text: 'Onboard any new clients closed', status: 'not-started' },
+                { id: 'lp-j-7-3', text: 'Check in with Client #1 (proactive success)', status: 'not-started' },
+                { id: 'lp-j-7-4', text: 'Begin Chris Simon training prep materials', status: 'not-started' },
+                { id: 'lp-j-7-5', text: 'Scrape lead list #3 (new niche or geography)', status: 'not-started' },
+            ],
+            agentTasks: [
+                { id: 'lp-a-7-1', text: 'Generate Chris training curriculum', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-7-2', text: 'Client #1 first week performance report', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-7-3', text: 'Expand cold email to list #3', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-7-4', text: 'Social media batch week 7', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-7-5', text: 'Weekly business review #5', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-7-6', text: 'Case study draft (if Client #1 showing results)', agent: 'Builder', status: 'not-started' },
+            ],
+            gate: [
+                { id: 'lp-g-7-1', text: 'Chris training materials prepared', passed: false },
+                { id: 'lp-g-7-2', text: 'Client #1 still active and satisfied', passed: false },
+                { id: 'lp-g-7-3', text: '2+ lead lists loaded into Instantly', passed: false },
+                { id: 'lp-g-7-4', text: 'Cold email sending at full volume', passed: false },
+            ]
+        },
+        {
+            week: 8, name: 'LAUNCH READY', theme: 'Chris Arrives. The Machine is Running.',
+            dates: 'May 31 - Jun 6', dateStart: '2026-05-31', dateEnd: '2026-06-06',
+            status: 'locked',
+            budget: { estimated: 1700, actual: 0 },
+            estHours: { jasper: '12-15', agent: '3-5' },
+            jasperTasks: [
+                { id: 'lp-j-8-1', text: 'Chris Day 1 (June 1): Orientation + system tour', status: 'not-started' },
+                { id: 'lp-j-8-2', text: 'Hand Chris sales deck, proposals, battle cards', status: 'not-started' },
+                { id: 'lp-j-8-3', text: 'Review all agent outputs from 8 weeks', status: 'not-started' },
+                { id: 'lp-j-8-4', text: 'Monthly financial review (Wave P&L)', status: 'not-started' },
+                { id: 'lp-j-8-5', text: 'Set Month 2 targets with Chris', status: 'not-started' },
+            ],
+            agentTasks: [
+                { id: 'lp-a-8-1', text: 'Generate Chris prospect lists (pre-enriched)', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-8-2', text: 'Create Chris daily talking points', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-8-3', text: 'Month 1 business metrics report', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-8-4', text: 'Social media batch week 8', agent: 'Builder', status: 'not-started' },
+                { id: 'lp-a-8-5', text: 'All systems health audit', agent: 'Sentinel', status: 'not-started' },
+            ],
+            gate: [
+                { id: 'lp-g-8-1', text: 'Chris trained and selling', passed: false },
+                { id: 'lp-g-8-2', text: '1-3 paying clients live', passed: false },
+                { id: 'lp-g-8-3', text: 'Overnight agent pipeline running nightly', passed: false },
+                { id: 'lp-g-8-4', text: 'Knowledge base: 15+ articles', passed: false },
+                { id: 'lp-g-8-5', text: 'Cold email: 3+ active campaigns', passed: false },
+                { id: 'lp-g-8-6', text: 'All legal agreements signed', passed: false },
+                { id: 'lp-g-8-7', text: 'Financial systems active (Wave tracking)', passed: false },
+            ]
+        },
+    ],
 
     // ---- Intel & Docs Reference ----
     intel: [
@@ -449,6 +796,7 @@ completed: [
                 { name: 'Full Scope Report', desc: 'Free tools, validation, revenue projections', path: 'docs/research/03-full-scope-report.md', status: 'current' },
                 { name: 'Agent Audit', desc: 'Pipeline bugs found + fixed, architecture verified', path: 'docs/research/01-agent-audit.md', status: 'current' },
                 { name: 'Discovery Synthesis', desc: 'CEO answers to 68 discovery questions', path: 'docs/research/00-discovery-synthesis.md', status: 'current' },
+                { name: 'SMS/Voice Cap Research', desc: 'Industry benchmarks for GHL agency pricing (Twilio costs, caps per tier)', path: 'msa_review.md', status: 'current' },
             ]
         },
         {
@@ -457,9 +805,8 @@ completed: [
             docs: [
                 { name: 'Mass Outreach Bible', desc: 'Infrastructure, compliance, sequences, 90-day plan', path: 'docs/outreach/mass-outreach-bible.md', status: 'key' },
                 { name: 'Email Infrastructure Guide', desc: 'DNS setup, warmup status, remaining steps', path: 'docs/outreach/email-infrastructure-setup-guide.md', status: 'current' },
-                { name: 'Package Proposal v1', desc: 'Full proposal with tool matrix + stress test', path: 'docs/sales/package-proposal-v1.md', status: 'current' },
-
-{ name: 'Compensation Structure', desc: 'Chris pay: base, commission, training', path: 'docs/sales/compensation-structure.md', status: 'current' },
+                { name: 'Package Proposal v1', desc: 'Full proposal with tool matrix + stress test (needs pricing update)', path: 'docs/sales/package-proposal-v1.md', status: 'needs-update' },
+                { name: 'Compensation Structure', desc: 'Chris: $1,200/wk + 20% setup + 5% recurring', path: 'docs/sales/compensation-structure.md', status: 'current' },
                 { name: 'Sales Playbook', desc: 'Pitch scripts, demo flow (needs pricing update)', path: 'docs/sales/sales-playbook.md', status: 'needs-update' },
             ]
         },
@@ -468,18 +815,30 @@ completed: [
             icon: '⚖️',
             docs: [
                 { name: 'Liability & Contracts', desc: 'MSA scope, compliance requirements', path: 'docs/legal/liability-and-contracts.md', status: 'current' },
-                { name: 'Client Service Agreement', desc: 'Agent drafting tonight — check handoffs/', path: 'state/handoffs/client-service-agreement-v1.md', status: 'pending' },
-                { name: 'Chris 1099 Agreement', desc: 'Agent drafting tonight — check handoffs/', path: 'state/handoffs/chris-1099-agreement-v1.md', status: 'pending' },
+                { name: 'Client Service Agreement (MSA)', desc: 'CEO review in progress — 5 flags addressed, ready for attorney', path: 'agent-output/legal/client-service-agreement-draft.md', status: 'key' },
+                { name: 'Chris 1099 Agreement', desc: 'AI draft complete — awaiting CEO review', path: 'agent-output/legal/chris-1099-agreement-draft.md', status: 'pending' },
             ]
         },
         {
-            category: 'Agent Outputs',
+            category: 'Agent Outputs (6 drafts — CEO review)',
             icon: '🤖',
             docs: [
-                { name: 'Cold Email Sequences', desc: 'HVAC + Plumber — 10 emails, 30 subject lines', path: 'state/handoffs/cold-email-sequences-v1.md', status: 'pending' },
-                { name: 'Competitive Intel', desc: 'Houston market analysis + battle cards', path: 'state/handoffs/competitive-intel-v1.md', status: 'pending' },
-                { name: 'Knowledge Base', desc: '8 FAQ articles for client support', path: 'state/handoffs/knowledge-base-articles-v1.md', status: 'pending' },
-                { name: 'Social Media Batch', desc: '15 posts with 3-week calendar', path: 'state/handoffs/social-media-batch-v1.md', status: 'pending' },
+                { name: 'Cold Email Sequences', desc: 'HVAC — 5 emails, needs CEO review', path: 'agent-output/email/cold-sequence-v1.md', status: 'pending' },
+                { name: 'Competitive Intel', desc: 'Sprint 01 — Houston agency pricing teardown', path: 'agent-output/research/sprint-01-market-intelligence-2026-04-06.md', status: 'current' },
+                { name: 'Knowledge Base FAQ', desc: '8 FAQ articles for client support', path: 'agent-output/training/knowledge-base-faq-v1.md', status: 'pending' },
+                { name: 'Social Media Batch', desc: '15 posts + 3-week calendar', path: 'agent-output/drafts/social-media-batch-v1.md', status: 'pending' },
+            ]
+        },
+        {
+            category: 'Brain (v2 Memory System)',
+            icon: '🧠',
+            docs: [
+                { name: 'BOOT.md', desc: 'Session entry file — auto-regenerated each session', path: 'brain/v2/BOOT.md', status: 'current' },
+                { name: 'IDENTITY.md', desc: 'Stable brand, pricing, team — canonical', path: 'brain/v2/IDENTITY.md', status: 'key' },
+                { name: 'NOW.md', desc: 'This week snapshot (~400 words, rewritten Mon)', path: 'brain/v2/NOW.md', status: 'current' },
+                { name: 'TASKS.jsonl', desc: '34 tasks tracked — machine-readable ledger', path: 'brain/v2/TASKS.jsonl', status: 'current' },
+                { name: 'DECISIONS.jsonl', desc: '20 decisions logged — append-only', path: 'brain/v2/DECISIONS.jsonl', status: 'current' },
+                { name: 'PROTOCOL.md', desc: 'Operating manual for all agents', path: 'brain/v2/PROTOCOL.md', status: 'key' },
             ]
         },
         {
@@ -488,7 +847,7 @@ completed: [
             docs: [
                 { name: 'Chris Simon', desc: 'Head of Sales — starts June 1, 2026', path: null, status: 'confirmed' },
                 { name: 'TX Attorney', desc: 'TBD — needed for MSA + 1099 review ($300-500)', path: null, status: 'needed' },
-                { name: 'GHL Support', desc: 'support.gohighlevel.com — after signup', path: null, status: 'pending' },
+                { name: 'GHL Support', desc: 'support.gohighlevel.com — active', path: null, status: 'confirmed' },
             ]
         },
     ],
@@ -496,21 +855,35 @@ completed: [
     // ---- Key Metrics ----
     metrics: {
         coldEmailsSent: 0,
-        emailWarmupDay: 5,
+        emailWarmupDay: 8,
         emailWarmupTarget: 14,
         emailWarmupReadyDate: 'April 21',
         emailOpenRate: 0,
         emailReplies: 0,
-        leadsInPipeline: 0,
+        leadsInPipeline: 6,
         discoveryCalls: 0,
-        proposalsSent: 0,
+        proposalsSent: 1,
         clientsClosed: 0,
         mrr: 0,
-        ghlSessionsCompleted: 0,
-        ghlSessionsTarget: 37,
+        ghlSessionsCompleted: 2,
+        ghlSessionsTarget: 7,
+        ghlCustomFields: 11,
+        ghlContacts: 4,
+        ghlDeals: 6,
+        ghlWorkflowsBuilt: 4,
+        ghlWorkflowsTarget: 5,
+        ghlMcpTools: 215,
         sopsAutoGenerated: 0,
-        agentTasksCompleted: 23,
-        kbArticles: 0,
+        agentTasksCompleted: 49,
+        kbArticles: 8,
+        agentDraftsComplete: 6,
+        agentDraftsReviewed: 1,
+        v2TasksTotal: 34,
+        v2TasksDone: 4,
+        v2TasksInProgress: 2,
+        v2DecisionsLogged: 20,
+        weekGatesPassedTotal: 8,
+        weekGatesTotal: 9,
     },
 
     // ---- 8-Week Timeline (Updated + Dependencies — Feature 3) ----
@@ -526,22 +899,22 @@ completed: [
         { num: 8, name: 'LAUNCH', dates: 'Jun 1+', theme: 'Chris Arrives. Machine Running.', status: 'upcoming', blockedBy: ['W7 Sales Pipeline Active'] },
     ],
 
-    // ---- Decision Journal (ENHANCED — Feature 4) ----
+    // ---- Decision Journal (ENHANCED — Feature 4, synced with DECISIONS.jsonl) ----
     decisions: [
-
-{ date: 'Apr 11', decision: 'VA eliminated — AI agents replace all functions', impact: '$850/mo saved permanently', tag: 'team', reasoning: '6-phase research showed AI agents (OpenClaw + Antigravity + Sentinel) can handle 100% of planned VA tasks: content, monitoring, reports, social. GHL MCP makes CRM ops zero-click.', alternatives: 'Keep VA at $850/mo as backup → rejected: no unique value VA provides that agents can\'t.' },
-        { date: 'Apr 11', decision: 'GHL MCP adopted — Claude controls GHL directly', impact: '269+ tools, zero manual clicking', tag: 'tools', reasoning: 'Discovered official GHL MCP integration (GitHub: mastanley13/GoHighLevel-MCP). Claude can create contacts, manage pipelines, send messages, build workflows — all via API. Eliminates need for manual GHL clicking.', alternatives: 'Manual GHL only → rejected: 10x slower. Zapier bridge → rejected: adds cost + complexity.' },
-        { date: 'Apr 11', decision: 'Buffer eliminated — GHL Social Planner via MCP', impact: '$0 vs $15/mo', tag: 'tools', reasoning: 'GHL has built-in social media planner. Agents can schedule posts via MCP. Buffer adds zero unique value.', alternatives: 'Keep Buffer free tier → rejected: limited, another login. Later.so → rejected: same issue.' },
-        { date: 'Apr 11', decision: 'Scribe adopted — auto-SOP generation', impact: 'Learning = documentation (free)', tag: 'tools', reasoning: 'Scribe auto-captures clicking workflows as documented SOPs. Every GHL learning session simultaneously produces training materials for Chris and reusable documentation.', alternatives: 'Manual SOP writing → rejected: 3x slower, won\'t happen consistently.' },
-        { date: 'Apr 11', decision: 'Overnight agents: dynamic proposals, not fixed schedule', impact: 'Higher ROI per night', tag: 'agents', reasoning: 'Fixed nightly schedules waste compute on low-priority tasks. Dynamic proposals let agents assess current priorities, suggest highest-impact work, and get CEO approval before executing.', alternatives: 'Cron-based fixed schedule → rejected: rigid, wastes API tokens on low-value recurring tasks.' },
-        { date: 'Apr 11', decision: 'Starter price updated: $197 → $249/mo', impact: '+$52/client/mo margin', tag: 'pricing', reasoning: 'Competitor analysis showed $249 is still well below market ($297-497 range). Extra $52/client/mo improves margins meaningfully at scale. No competitive disadvantage.', alternatives: 'Keep $197 → rejected: left money on table. Jump to $297 → rejected: too close to Growth tier.' },
-        { date: 'Apr 9', decision: 'Marketing budget: $3K pre-launch (deferred to post-revenue)', impact: 'Cash preserved', tag: 'marketing', reasoning: 'With $18.9K runway and no revenue, spending $3K on marketing pre-launch is premature. Cold email is near-zero cost. Defer paid ads until setup fee revenue covers them.', alternatives: 'Spend $3K now on Facebook ads → rejected: no product to sell yet, would burn cash with no conversion path.' },
-        { date: 'Apr 9', decision: '$997 Founding Member pricing (5 cap)', impact: 'Validates model without Chris', tag: 'pricing', reasoning: 'Discounted setup fee creates urgency, generates pre-launch social proof, and validates the delivery model before committing to Chris\'s salary.', alternatives: 'Full price from Day 1 → rejected: harder to close without case studies. Free beta → rejected: attracts wrong customers, devalues product.' },
-        { date: 'Apr 9', decision: 'AI drafts + real attorney review ($300-500)', impact: 'Legal costs reduced 60-70%', tag: 'legal', reasoning: 'AI can draft 90% of MSA and 1099 agreements. Attorney reviews and finalizes. Saves $1-2K vs. attorney drafting from scratch.', alternatives: 'DIY legal → rejected: too risky. Full attorney draft → rejected: $1.5-3K, unnecessary.' },
-        { date: 'Apr 7', decision: '4 sending domains purchased for cold email', impact: '$40.63 total', tag: 'outreach', reasoning: 'Multiple domains distribute sending reputation risk. If one domain gets flagged, others continue. Industry best practice for cold email at scale.', alternatives: '1 domain → rejected: single point of failure. 6+ domains → rejected: overkill for initial volume.' },
-
-{ date: 'Apr 5', decision: 'Growth tier locked at $347/mo', impact: 'Pricing finalized', tag: 'pricing', reasoning: 'Originally $297/mo gave only 12-17% margin after GHL costs. $347 provides 25-30% margin while remaining competitive. Revisit at Month 3 with real cost data.', alternatives: '$297 → rejected: margin too thin. $397 → rejected: too close to Scale tier, creates cannibalization.' },
-        { date: 'Apr 4', decision: 'Chris compensation: $1,200/wk + 20% setup + 5% recurring', impact: 'Aligned incentives', tag: 'team', reasoning: 'Base covers living expenses. Setup commission rewards closing. Recurring commission rewards retention and long-term thinking. Total comp competitive for Houston market.', alternatives: '100% commission → rejected: too risky for Chris, creates desperation selling. Salary only → rejected: no closing incentive.' },
+        { date: 'Apr 15', decision: 'Cross-agent write safety added to PROTOCOL.md (D-0020)', impact: 'Prevents conflicts between Antigravity + OpenClaw on TASKS.jsonl', tag: 'infra', reasoning: 'Multiple agents editing TASKS.jsonl could overwrite each other. CHANGELOG.jsonl as tiebreaker + mandatory logging on every status change prevents drift.', alternatives: 'File locking → rejected: not practical across different agent runtimes.' },
+        { date: 'Apr 15', decision: 'Total Transformation tier reinstated at $14,997+$4,997 (D-0019)', impact: '4-tier pricing ladder restored', tag: 'pricing', reasoning: 'Removing the top tier left no aspirational option. TT positioned as "sell after case studies" — not actively marketed but available for high-value clients.', alternatives: 'Keep at 3 tiers → rejected: loses revenue ceiling for enterprise-adjacent clients.' },
+        { date: 'Apr 15', decision: 'Pricing LOCKED at 4 tiers — Starter/Growth/Scale/TT (D-0017)', impact: 'Final pricing — no more changes', tag: 'pricing', reasoning: 'Simpler 3-tier core ladder (Starter $997+$397, Growth $2,497+$999, Scale $4,997+$1,995) with TT as premium anchor. Supersedes all prior pricing decisions.', alternatives: 'More tiers → rejected: confuses Chris, slows sales. Fewer tiers → rejected: leaves money on table.' },
+        { date: 'Apr 15', decision: 'v2 Memory Scaffold adopted (D-0001)', impact: 'Eliminates agent context drift', tag: 'infra', reasoning: 'MASTER_STATE.md doing too many jobs, DAILY_LATEST.md overwritten every session, no machine-readable task ledger. v2 splits into IDENTITY + NOW + BOOT + TASKS.jsonl + DECISIONS.jsonl + CHANGELOG.jsonl.', alternatives: 'Keep legacy single-file brain → rejected: proven to cause drift across 10+ sessions.' },
+        { date: 'Apr 11', decision: 'VA eliminated — AI agents replace all functions', impact: '$850/mo saved permanently', tag: 'team', reasoning: '6-phase research showed AI agents (OpenClaw + Antigravity + Sentinel) can handle 100% of planned VA tasks.', alternatives: 'Keep VA at $850/mo as backup → rejected: no unique value VA provides that agents can\'t.' },
+        { date: 'Apr 11', decision: 'GHL MCP adopted — Claude controls GHL directly', impact: '215 tools, zero manual clicking', tag: 'tools', reasoning: 'GHL MCP integration lets Claude create contacts, manage pipelines, send messages, build workflows — all via API.', alternatives: 'Manual GHL only → rejected: 10x slower. Zapier bridge → rejected: adds cost + complexity.' },
+        { date: 'Apr 11', decision: 'Buffer eliminated — GHL Social Planner via MCP', impact: '$0 vs $15/mo', tag: 'tools', reasoning: 'GHL has built-in social media planner. Agents can schedule posts via MCP.', alternatives: 'Keep Buffer free tier → rejected: limited, another login.' },
+        { date: 'Apr 11', decision: 'Scribe adopted — auto-SOP generation', impact: 'Learning = documentation (free)', tag: 'tools', reasoning: 'Scribe auto-captures clicking workflows as documented SOPs.', alternatives: 'Manual SOP writing → rejected: 3x slower.' },
+        { date: 'Apr 11', decision: 'Overnight agents: dynamic proposals, not fixed schedule', impact: 'Higher ROI per night', tag: 'agents', reasoning: 'Dynamic proposals let agents assess current priorities, suggest highest-impact work, and get CEO approval before executing.', alternatives: 'Cron-based fixed schedule → rejected: rigid, wastes API tokens.' },
+        { date: 'Apr 9', decision: 'Marketing budget: $3K pre-launch (deferred to post-revenue)', impact: 'Cash preserved', tag: 'marketing', reasoning: 'With $18.9K runway and no revenue, cold email is near-zero cost. Defer paid ads until setup fee revenue covers them.', alternatives: 'Spend $3K now on Facebook ads → rejected: no product to sell yet.' },
+        { date: 'Apr 9', decision: '$997 early-access setup pricing (SUPERSEDED by D-0017)', impact: 'Validated model without Chris', tag: 'pricing', reasoning: 'Originally set discounted setup fee for first 5 clients. Superseded by v2 pricing lock — Starter is now $997+$397 as standard pricing.', alternatives: 'Full price from Day 1 → rejected at time: harder to close without case studies.' },
+        { date: 'Apr 9', decision: 'AI drafts + real attorney review ($300-500)', impact: 'Legal costs reduced 60-70%', tag: 'legal', reasoning: 'AI can draft 90% of MSA and 1099 agreements. Attorney reviews and finalizes.', alternatives: 'DIY legal → rejected: too risky. Full attorney draft → rejected: $1.5-3K.' },
+        { date: 'Apr 7', decision: '4 sending domains purchased for cold email', impact: '$40.63 total', tag: 'outreach', reasoning: 'Multiple domains distribute sending reputation risk.', alternatives: '1 domain → rejected: single point of failure.' },
+        { date: 'Apr 4', decision: 'Chris compensation: $1,200/wk + 20% setup + 5% recurring', impact: 'Aligned incentives', tag: 'team', reasoning: 'Base covers living expenses. Setup commission rewards closing. Recurring commission rewards retention.', alternatives: '100% commission → rejected: too risky for Chris.' },
     ],
 
     // ---- Alerts / What Broke Panel (Feature 5) ----
@@ -567,10 +940,14 @@ completed: [
             { date: 'Apr 9', remaining: 116 },
             { date: 'Apr 10', remaining: 113 },
             { date: 'Apr 11', remaining: 108 },
+            { date: 'Apr 12', remaining: 105 },
+            { date: 'Apr 13', remaining: 96 },
+            { date: 'Apr 14', remaining: 88 },
+            { date: 'Apr 15', remaining: 78 },
         ],
     },
 
-    prioritiesLastUpdated: '2026-04-11T21:00:00-05:00',
+    prioritiesLastUpdated: '2026-04-15T14:43:00-05:00',
 };
 
 // ---- Persistence Layer ----
@@ -582,9 +959,12 @@ function saveData() {
             _dataVersion: typeof DATA_VERSION !== 'undefined' ? DATA_VERSION : '',
             jasperTasks: SANO_DATA.jasperTasks,
             aiTasks: SANO_DATA.aiTasks,
+            launchPlan: SANO_DATA.launchPlan,
             approvals: SANO_DATA.approvals,
             comments: SANO_DATA.comments,
             metrics: SANO_DATA.metrics,
+            focusPins: SANO_DATA.focusPins,
+            streakConfig: SANO_DATA.streakConfig,
             savedAt: new Date().toISOString()
         }));
     } catch (e) {
@@ -633,6 +1013,22 @@ function loadSavedData() {
                 });
 
 }
+            // Restore launch plan statuses
+            if (parsed.launchPlan) {
+                parsed.launchPlan.forEach((week, wi) => {
+                    if (SANO_DATA.launchPlan[wi]) {
+                        if (week.jasperTasks) week.jasperTasks.forEach((t, ti) => {
+                            if (SANO_DATA.launchPlan[wi].jasperTasks[ti]) SANO_DATA.launchPlan[wi].jasperTasks[ti].status = t.status;
+                        });
+                        if (week.agentTasks) week.agentTasks.forEach((t, ti) => {
+                            if (SANO_DATA.launchPlan[wi].agentTasks[ti]) SANO_DATA.launchPlan[wi].agentTasks[ti].status = t.status;
+                        });
+                        if (week.gate) week.gate.forEach((g, gi) => {
+                            if (SANO_DATA.launchPlan[wi].gate[gi]) SANO_DATA.launchPlan[wi].gate[gi].passed = g.passed;
+                        });
+                    }
+                });
+            }
             console.log('📦 Loaded saved data from', parsed.savedAt);
         }
     } catch (e) {
