@@ -4,17 +4,17 @@
    Updated: April 11, 2026
    ============================================ */
 
-const DATA_VERSION = '2026-04-11-v8-features';
+const DATA_VERSION = '2026-04-15-v11-cc-v9-redesign';
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedData();
     initClock();
     initCountdown();
     renderAlertPanel();
-    renderWeekTimeline();
+    renderTodaysFocus();
     renderBurndownChart();
     renderOvernightReport();
-    renderDirectiveBadge();
+    renderAgentStatusBoard();
     renderAgentSpend();
     renderWarmupBar();
     renderJasperTasks();
@@ -26,8 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCompleted();
     renderComments();
     renderBudget();
+    renderLaunchPlan();
     updateProgressStats();
     updateTabCounts();
+    initKeyboardShortcuts();
 
     setInterval(updateClock, 1000);
     setInterval(updateCountdown, 60000);
@@ -55,23 +57,21 @@ function updateDateDisplay() {
 function initCountdown() { updateCountdown(); }
 
 function updateCountdown() {
+    const el = document.getElementById('headerCountdown');
     const diff = SANO_DATA.launchDate - new Date();
     if (diff <= 0) {
-        setText('countDays', '00');
-        setText('countHours', '00');
-        setText('countMins', '00');
+        if (el) el.innerHTML = '<span class="cd-number">0</span><span class="cd-unit"> days</span>';
         return;
     }
     const d = Math.floor(diff / 864e5);
     const h = Math.floor((diff % 864e5) / 36e5);
     const m = Math.floor((diff % 36e5) / 6e4);
-    setText('countDays', String(d).padStart(2, '0'));
-    setText('countHours', String(h).padStart(2, '0'));
-    setText('countMins', String(m).padStart(2, '0'));
-
-    const activeWeek = SANO_DATA.weeks.find(w => w.status === 'active');
-    if (activeWeek) {
-        setText('currentWeekLabel', `W${activeWeek.num} — ${activeWeek.name}`);
+    if (el) {
+        el.innerHTML = `<span class="cd-number">${d}</span><span class="cd-unit"> days</span>` +
+                       `<span class="cd-sep">·</span>` +
+                       `<span class="cd-number">${h}</span><span class="cd-unit"> hours</span>` +
+                       `<span class="cd-sep">·</span>` +
+                       `<span class="cd-number">${m}</span><span class="cd-unit"> minutes</span>`;
     }
 }
 
@@ -89,7 +89,7 @@ function renderWeekTimeline() {
             return `<span class="dep-tag ${bStatus}">${d}</span>`;
         }).join('')}</div>` : '';
         return `
-        <div class="week-block ${w.status}" title="${w.theme}">
+        <div class="week-block ${w.status}" title="${w.theme}" onclick="switchTab('launch'); setTimeout(() => scrollToLaunchWeek(${w.num}), 100)" style="cursor:pointer">
             <span class="week-num">W${w.num}</span>
             <span class="week-name">${w.name}</span>
             <span class="week-dates">${w.dates}</span>
@@ -307,8 +307,8 @@ function updateTabCounts() {
     const aiRemaining = SANO_DATA.aiTasks.flatMap(s => s.items).filter(i => i.status !== 'done' && i.status !== 'complete').length;
     const completedCount = SANO_DATA.completed.length;
 
-    setText('jasperTaskCount', jasperRemaining);
-    setText('aiTaskCount', aiRemaining);
+    const totalActive = jasperRemaining + aiRemaining;
+    setText('workTaskCount', totalActive);
     setText('completedTaskCount', completedCount);
 }
 
@@ -790,4 +790,695 @@ function scrollToSection(id) {
 }
 
 function resetToDefaultData() { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+
+/* ============================================
+   🗺️ LAUNCH PLAN TAB
+   ============================================ */
+
+function renderLaunchPlan() {
+    const plan = SANO_DATA.launchPlan;
+    if (!plan) return;
+
+    // Overall stats
+    const allTasks = plan.flatMap(w => [...w.jasperTasks, ...w.agentTasks]);
+    const doneTasks = allTasks.filter(t => t.status === 'done').length;
+    const totalTasks = allTasks.length;
+    const overallPct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+    const activeWeek = plan.find(w => w.status === 'active') || plan[0];
+
+    setText('launchPlanPct', `${overallPct}%`);
+    setText('launchPlanBadge', `Week ${activeWeek.week} of 8 · ${overallPct}% Complete`);
+
+    // NEXT UP card
+    const nextUpContainer = document.getElementById('launchNextUp');
+    if (nextUpContainer) {
+        const nextTask = activeWeek.jasperTasks.find(t => t.status !== 'done') ||
+                         activeWeek.agentTasks.find(t => t.status !== 'done');
+        if (nextTask) {
+            const isAgent = nextTask.agent ? true : false;
+            const typeLabel = isAgent ? `Agent (${nextTask.agent})` : 'Jasper Task';
+            nextUpContainer.innerHTML = `
+                <div class="lp-next-up">
+                    <span class="lp-next-label">⚡ NEXT UP</span>
+                    <span class="lp-next-task">${nextTask.text}</span>
+                    <span class="lp-next-meta">Week ${activeWeek.week} · ${typeLabel}</span>
+                </div>`;
+        } else {
+            nextUpContainer.innerHTML = '';
+        }
+    }
+
+    // Pill nav
+    const pillNav = document.getElementById('lpPillNav');
+    if (pillNav) {
+        pillNav.innerHTML = plan.map(w => {
+            const cls = w.status === 'active' ? 'lp-pill active' :
+                        w.status === 'done' ? 'lp-pill done' : 'lp-pill';
+            return `<button class="${cls}" onclick="scrollToLaunchWeek(${w.week})">W${w.week}</button>`;
+        }).join('');
+    }
+
+    // Week cards
+    const container = document.getElementById('launchPlanContent');
+    if (!container) return;
+
+    container.innerHTML = plan.map((w, wi) => {
+        const jDone = w.jasperTasks.filter(t => t.status === 'done').length;
+        const jTotal = w.jasperTasks.length;
+        const jPct = jTotal > 0 ? Math.round((jDone / jTotal) * 100) : 0;
+
+        const aDone = w.agentTasks.filter(t => t.status === 'done').length;
+        const aTotal = w.agentTasks.length;
+        const aPct = aTotal > 0 ? Math.round((aDone / aTotal) * 100) : 0;
+
+        const gPassed = w.gate.filter(g => g.passed).length;
+        const gTotal = w.gate.length;
+        const gateAllPassed = gPassed === gTotal;
+
+        // Pace indicator
+        const pace = calcWeekPace(w);
+        const paceLabel = pace === 'ahead' ? '🟢 AHEAD' :
+                          pace === 'behind' ? '🔴 BEHIND' :
+                          pace === 'on-pace' ? '🟡 ON PACE' : '';
+        const paceCls = pace === 'ahead' ? 'lp-pace-ahead' :
+                        pace === 'behind' ? 'lp-pace-behind' : 'lp-pace-onpace';
+
+        const isExpanded = w.status === 'active';
+        const statusCls = `lp-week-${w.status}`;
+        const statusIcon = w.status === 'done' ? '✅' :
+                           w.status === 'active' ? '●' :
+                           w.status === 'blocked' ? '⚠️' : '🔒';
+
+        // Gate warning
+        const gateWarning = (w.status === 'active' && !gateAllPassed) ?
+            `<div class="lp-gate-warning">⚠️ ${gTotal - gPassed} gate${gTotal - gPassed > 1 ? 's' : ''} not passed — not ready for Week ${w.week + 1}</div>` : '';
+
+        // Jasper task rows
+        const jasperHtml = w.jasperTasks.map((t, ti) => {
+            const icon = t.status === 'done' ? '✓' : t.status === 'in-progress' ? '●' : '○';
+            const cls = t.status === 'done' ? 'task-done' : t.status === 'in-progress' ? 'task-active' : '';
+            return `<div class="task-item ${cls}" onclick="cycleLaunchTask(${wi},'jasperTasks',${ti})">
+                <span class="task-icon">${icon}</span>
+                <span class="task-text">${t.text}</span>
+            </div>`;
+        }).join('');
+
+        // Agent task rows
+        const agentHtml = w.agentTasks.map((t, ti) => {
+            const icon = t.status === 'done' ? '✓' : t.status === 'in-progress' ? '●' : '○';
+            const cls = t.status === 'done' ? 'task-done' : t.status === 'in-progress' ? 'task-active' : '';
+            const badge = t.agent ? `<span class="agent-badge">${t.agent}</span>` : '';
+            return `<div class="task-item ${cls}" onclick="cycleLaunchTask(${wi},'agentTasks',${ti})">
+                <span class="task-icon">${icon}</span>
+                <span class="task-text">${t.text}</span>
+                ${badge}
+            </div>`;
+        }).join('');
+
+        // Gate rows
+        const gateHtml = w.gate.map((g, gi) => {
+            const icon = g.passed ? '■' : '□';
+            const cls = g.passed ? 'lp-gate-passed' : 'lp-gate-failed';
+            return `<div class="lp-gate-item ${cls}" onclick="toggleLaunchGate(${wi},${gi})">
+                <span class="lp-gate-icon">${icon}</span>
+                <span class="lp-gate-text">${g.text}</span>
+                <span class="lp-gate-status">${g.passed ? '✅' : '❌'}</span>
+            </div>`;
+        }).join('');
+
+        return `
+        <div class="lp-week-card ${statusCls}" id="lp-week-${w.week}">
+            <div class="lp-week-header" onclick="toggleLaunchWeek(${w.week})">
+                <div class="lp-week-title-row">
+                    <span class="lp-week-num">${statusIcon} W${w.week}</span>
+                    <span class="lp-week-name">${w.name}</span>
+                    ${paceLabel ? `<span class="lp-pace ${paceCls}">${paceLabel}</span>` : ''}
+                </div>
+                <div class="lp-week-meta">
+                    <span>${w.dates} · "${w.theme}"</span>
+                    <span>Budget: $${w.budget.estimated} est${w.budget.actual > 0 ? ' / $' + w.budget.actual + ' actual' : ''}</span>
+                    <span>${w.estHours.jasper} hrs Jasper · ${w.estHours.agent} hrs Agent</span>
+                </div>
+                <div class="lp-week-bars">
+                    <div class="lp-mini-bar"><div class="lp-mini-fill" style="width:${jPct}%"></div><span>🧠 ${jDone}/${jTotal}</span></div>
+                    <div class="lp-mini-bar"><div class="lp-mini-fill lp-mini-agent" style="width:${aPct}%"></div><span>🤖 ${aDone}/${aTotal}</span></div>
+                    <div class="lp-mini-bar"><div class="lp-mini-fill ${gateAllPassed ? 'lp-mini-gate-pass' : 'lp-mini-gate-fail'}" style="width:${gTotal > 0 ? (gPassed/gTotal)*100 : 0}%"></div><span>🚪 ${gPassed}/${gTotal}</span></div>
+                </div>
+            </div>
+            <div class="lp-week-body ${isExpanded ? 'open' : ''}" id="lp-body-${w.week}">
+                ${gateWarning}
+                <div class="lp-section-label">🧠 JASPER TASKS (${jDone}/${jTotal})</div>
+                ${jasperHtml}
+                <div class="lp-section-label" style="margin-top:12px">🤖 AGENT TASKS (${aDone}/${aTotal})</div>
+                ${agentHtml}
+                <div class="lp-section-label lp-gate-label" style="margin-top:12px">🚪 GATE (${gPassed}/${gTotal} passed)</div>
+                <div class="lp-gate-section">
+                    ${gateHtml}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function calcWeekPace(w) {
+    if (w.status !== 'active') return '';
+    const now = new Date();
+    const start = new Date(w.dateStart);
+    const end = new Date(w.dateEnd);
+    if (now < start) return '';
+    const totalDays = (end - start) / 86400000;
+    const elapsed = Math.min((now - start) / 86400000, totalDays);
+    const pctElapsed = elapsed / totalDays;
+
+    const allTasks = [...w.jasperTasks, ...w.agentTasks];
+    const done = allTasks.filter(t => t.status === 'done').length;
+    const pctDone = allTasks.length > 0 ? done / allTasks.length : 0;
+
+    const diff = pctDone - pctElapsed;
+    if (diff > 0.1) return 'ahead';
+    if (diff < -0.1) return 'behind';
+    return 'on-pace';
+}
+
+function cycleLaunchTask(wi, taskType, ti) {
+    const task = SANO_DATA.launchPlan[wi][taskType][ti];
+    const order = ['not-started', 'in-progress', 'done'];
+    task.status = order[(order.indexOf(task.status) + 1) % 3];
+    renderLaunchPlan();
+    saveData();
+}
+
+function toggleLaunchGate(wi, gi) {
+    SANO_DATA.launchPlan[wi].gate[gi].passed = !SANO_DATA.launchPlan[wi].gate[gi].passed;
+    renderLaunchPlan();
+    saveData();
+}
+
+function toggleLaunchWeek(weekNum) {
+    const body = document.getElementById(`lp-body-${weekNum}`);
+    if (body) body.classList.toggle('open');
+}
+
+function scrollToLaunchWeek(weekNum) {
+    const el = document.getElementById(`lp-week-${weekNum}`);
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Expand it
+        const body = document.getElementById(`lp-body-${weekNum}`);
+        if (body && !body.classList.contains('open')) body.classList.add('open');
+    }
+}
+
+/* ============================================
+   v9: TODAY'S FOCUS CARD
+   Smart ranking: pinned > blocking > time-sensitive > ROI
+   ============================================ */
+function computeTodaysFocus() {
+    const pins = SANO_DATA.focusPins || { jasper: [], ai: [] };
+
+    // Collect all Jasper tasks that aren't done
+    const jasperAll = [];
+    SANO_DATA.jasperTasks.forEach((section, si) => {
+        section.items.forEach((item, ii) => {
+            if (item.status !== 'done') {
+                jasperAll.push({ ...item, si, ii, id: `j-${si}-${ii}` });
+            }
+        });
+    });
+
+    // Collect all AI tasks that aren't done/complete
+    const aiAll = [];
+    SANO_DATA.aiTasks.forEach((section, si) => {
+        section.items.forEach((item, ii) => {
+            if (item.status !== 'done' && item.status !== 'complete') {
+                aiAll.push({ ...item, si, ii, id: `a-${si}-${ii}` });
+            }
+        });
+    });
+
+    // Scoring function
+    function scoreTask(task, pinList) {
+        let score = 0;
+        if (pinList.includes(task.id)) score += 1000; // pinned always first
+        if (task.status === 'in-progress') score += 100; // active tasks next
+        if (task.status === 'running') score += 80;
+        if (task.day === 'Tue' || task.day === 'Wed') score += 50; // this week
+        if (task.time && parseInt(task.time) <= 20) score += 30; // quick wins
+        if (task.status === 'queued') score += 10;
+        return score;
+    }
+
+    jasperAll.sort((a, b) => scoreTask(b, pins.jasper) - scoreTask(a, pins.jasper));
+    aiAll.sort((a, b) => scoreTask(b, pins.ai) - scoreTask(a, pins.ai));
+
+    return {
+        jasper: jasperAll.slice(0, 5),
+        ai: aiAll.slice(0, 5)
+    };
+}
+
+function renderTodaysFocus() {
+    const focus = computeTodaysFocus();
+    const pins = SANO_DATA.focusPins || { jasper: [], ai: [] };
+
+    // Date
+    const dateEl = document.getElementById('focusDate');
+    if (dateEl) {
+        dateEl.textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'short', month: 'short', day: 'numeric'
+        });
+    }
+
+    // Jasper column
+    const jasperEl = document.getElementById('focusJasper');
+    if (jasperEl) {
+        if (focus.jasper.length === 0) {
+            jasperEl.innerHTML = '<div class="focus-complete">✅ All caught up!</div>';
+        } else {
+            const totalJ = SANO_DATA.jasperTasks.flatMap(s => s.items).length;
+            const doneJ = SANO_DATA.jasperTasks.flatMap(s => s.items).filter(i => i.status === 'done').length;
+            const pctJ = totalJ > 0 ? Math.round((doneJ / totalJ) * 100) : 0;
+
+            const items = focus.jasper.map((item, idx) => {
+                const isPinned = pins.jasper.includes(item.id);
+                const tag = isPinned ? '<span class="focus-tag focus-tag-pinned">📌 PINNED</span>' :
+                            item.status === 'in-progress' ? '<span class="focus-tag focus-tag-urgent">⏰ ACTIVE</span>' :
+                            '<span class="focus-tag focus-tag-roi">💰 HIGH ROI</span>';
+                const timeBadge = item.time ? `<span class="time-badge-sm">${item.time}</span>` : '';
+                return `<div class="focus-item" onclick="cycleJasperTask(${item.si},${item.ii}); renderTodaysFocus();">
+                    <span class="focus-num">${idx + 1}</span>
+                    <div class="focus-checkbox"></div>
+                    <span class="focus-text">${item.text}</span>
+                    ${tag}
+                    ${timeBadge}
+                    <span class="focus-pin ${isPinned ? 'pinned' : ''}" onclick="event.stopPropagation(); toggleFocusPin('jasper','${item.id}')" title="Pin to focus">📌</span>
+                </div>`;
+            }).join('');
+
+            jasperEl.innerHTML = items +
+                `<div class="focus-progress">
+                    <div class="focus-progress-bar"><div class="focus-progress-fill" style="width:${pctJ}%"></div></div>
+                    <span class="focus-progress-text">${doneJ}/${totalJ} done</span>
+                </div>`;
+        }
+    }
+
+    // AI column
+    const aiEl = document.getElementById('focusAI');
+    if (aiEl) {
+        if (focus.ai.length === 0) {
+            aiEl.innerHTML = '<div class="focus-complete">✅ All caught up!</div>';
+        } else {
+            const totalA = SANO_DATA.aiTasks.flatMap(s => s.items).length;
+            const doneA = SANO_DATA.aiTasks.flatMap(s => s.items).filter(i => i.status === 'done' || i.status === 'complete').length;
+            const pctA = totalA > 0 ? Math.round((doneA / totalA) * 100) : 0;
+
+            const items = focus.ai.map((item, idx) => {
+                const isPinned = pins.ai.includes(item.id);
+                const statusCls = item.status === 'running' ? 'focus-status-ready' :
+                                  item.status === 'queued' ? 'focus-status-queued' : 'focus-status-queued';
+                const statusText = item.status === 'running' ? 'RUNNING' :
+                                   item.status === 'queued' ? 'QUEUED' :
+                                   item.status === 'in-progress' ? 'ACTIVE' : 'READY';
+                const tag = isPinned ? '<span class="focus-tag focus-tag-pinned">📌 PINNED</span>' :
+                            '<span class="focus-tag focus-tag-unlock">🔑 AI TASK</span>';
+                const agentLabel = item.agent ? `<span class="agent-badge" style="font-size:0.45rem">${item.agent}</span>` : '';
+                return `<div class="focus-item">
+                    <span class="focus-num">${idx + 1}</span>
+                    <span class="focus-status ${statusCls}">${statusText}</span>
+                    <span class="focus-text">${item.text}</span>
+                    ${tag}
+                    ${agentLabel}
+                    <span class="focus-pin ${isPinned ? 'pinned' : ''}" onclick="event.stopPropagation(); toggleFocusPin('ai','${item.id}')" title="Pin to focus">📌</span>
+                </div>`;
+            }).join('');
+
+            aiEl.innerHTML = items +
+                `<div class="focus-progress">
+                    <div class="focus-progress-bar"><div class="focus-progress-fill" style="width:${pctA}%"></div></div>
+                    <span class="focus-progress-text">${doneA}/${totalA} done</span>
+                </div>`;
+        }
+    }
+
+    // Check if all focus items are done
+    const allDone = focus.jasper.length === 0 && focus.ai.length === 0;
+    const completeEl = document.getElementById('focusComplete');
+    const columnsEl = document.querySelector('.focus-columns');
+    if (completeEl && columnsEl) {
+        completeEl.style.display = allDone ? 'block' : 'none';
+        columnsEl.style.display = allDone ? 'none' : '';
+    }
+}
+
+function toggleFocusPin(type, id) {
+    const pins = SANO_DATA.focusPins[type];
+    const idx = pins.indexOf(id);
+    if (idx >= 0) {
+        pins.splice(idx, 1);
+    } else {
+        pins.push(id);
+    }
+    renderTodaysFocus();
+    saveData();
+    showToast(`Focus pin ${idx >= 0 ? 'removed' : 'added'}`);
+}
+
+/* ============================================
+   v9: MOMENTUM & STREAK TRACKER
+   ============================================ */
+function renderMomentum() {
+    // Day count
+    const start = new Date(SANO_DATA.projectStartDate || '2026-04-04');
+    const now = new Date();
+    const dayNum = Math.floor((now - start) / 86400000) + 1;
+    setText('dayCount', `DAY ${dayNum}`);
+
+    // Tasks shipped (completed count)
+    const shipped = SANO_DATA.completed.length;
+    setText('tasksShipped', `${shipped} shipped`);
+
+    // Streak calculation
+    const streak = calculateStreak();
+    setText('streakLabel', `${streak}-day streak`);
+
+    const streakBadge = document.getElementById('streakBadge');
+    if (streakBadge) {
+        streakBadge.textContent = `🔥 ${streak}`;
+        streakBadge.style.display = streak > 0 ? '' : 'none';
+    }
+}
+
+function calculateStreak() {
+    // Simple streak: count how many consecutive days (from today backwards)
+    // have at least one completion in the burndown log (remaining decreased)
+    const log = SANO_DATA.burndown?.log || [];
+    if (log.length < 2) return 0;
+
+    let streak = 0;
+    const freezesPerWeek = SANO_DATA.streakConfig?.freezesPerWeek || 2;
+    let freezesUsed = 0;
+
+    for (let i = log.length - 1; i > 0; i--) {
+        const progress = log[i - 1].remaining - log[i].remaining;
+        if (progress > 0) {
+            streak++;
+            freezesUsed = 0; // reset freeze counter on active day
+        } else {
+            // No progress — use a freeze
+            freezesUsed++;
+            if (freezesUsed <= freezesPerWeek) {
+                streak++; // freeze day, streak continues
+            } else {
+                break; // streak broken
+            }
+        }
+    }
+    return streak;
+}
+
+/* ============================================
+   v9: AGENT STATUS DOTS (Hero Row)
+   ============================================ */
+function renderAgentDots() {
+    const container = document.getElementById('agentDots');
+    if (!container) return;
+
+    const agents = SANO_DATA.agentRegistry || [];
+    const reports = SANO_DATA.agentReports || [];
+
+    container.innerHTML = agents.map(agent => {
+        // Find latest report for this agent
+        const lastReport = reports.find(r =>
+            r.agent?.toLowerCase().includes(agent.id.toLowerCase()) ||
+            r.agent?.toLowerCase().includes(agent.name.toLowerCase())
+        );
+        
+        let status = 'offline';
+        let timeAgo = '';
+        if (lastReport) {
+            // Check if agent was active recently (within this session)
+            const reportTime = lastReport.time || '';
+            if (reportTime.includes('2026-04-15')) {
+                status = reportTime.includes('14:') || reportTime.includes('15:') ? 'active' : 'idle';
+            } else {
+                status = 'idle';
+            }
+            timeAgo = reportTime.split(' ')[1] || '';
+        }
+
+        const dotCls = status === 'active' ? 'dot-active' : status === 'idle' ? 'dot-idle' : 'dot-offline';
+        const label = agent.name.substring(0, 3).toUpperCase();
+
+        return `<div class="hc-agent-dot">
+            <span class="dot ${dotCls}"></span>
+            <span>${label}</span>
+        </div>`;
+    }).join('');
+}
+
+/* ============================================
+   v9: AGENT STATUS BOARD (Full Cards)
+   ============================================ */
+function renderAgentStatusBoard() {
+    const container = document.getElementById('agentStatusBoard');
+    if (!container) return;
+
+    const agents = SANO_DATA.agentRegistry || [];
+    const reports = SANO_DATA.agentReports || [];
+    const spend = SANO_DATA.agentSpend || {};
+
+    container.innerHTML = agents.map(agent => {
+        const lastReport = reports.find(r =>
+            r.agent?.toLowerCase().includes(agent.name.toLowerCase())
+        );
+
+        let status = 'offline';
+        let statusLabel = 'Not Deployed';
+        let cardClass = '';
+        let lastAction = '—';
+        let lastTime = '—';
+        let taskCount = 0;
+        let todayCost = '$0.00';
+
+        if (lastReport) {
+            const reportDate = lastReport.time || '';
+            if (reportDate.includes('2026-04-15')) {
+                status = 'active';
+                statusLabel = '🟢 Active';
+                cardClass = 'agent-active';
+            } else {
+                status = 'idle';
+                statusLabel = '💤 Idle';
+                cardClass = 'agent-idle';
+            }
+            lastAction = lastReport.summary || lastReport.items?.[0] || '—';
+            if (lastAction.length > 60) lastAction = lastAction.substring(0, 57) + '...';
+            lastTime = lastReport.time || '—';
+            taskCount = lastReport.items?.length || 0;
+        }
+
+        // Get cost from agentSpend history
+        const history = spend.history || [];
+        const todayEntry = history.find(h => h.date === 'Apr 15');
+        if (todayEntry) {
+            const agentCost = todayEntry.agents?.find(a =>
+                a.name?.toLowerCase().includes(agent.name.toLowerCase())
+            );
+            if (agentCost) todayCost = agentCost.cost || '$0.00';
+        }
+
+        const statusCls = status === 'active' ? 'agent-status-active' :
+                          status === 'idle' ? 'agent-status-idle' : 'agent-status-offline';
+
+        return `<div class="agent-card ${cardClass}">
+            <div class="agent-card-header">
+                <span class="agent-card-icon">${agent.icon}</span>
+                <span class="agent-card-name">${agent.name}</span>
+                <span class="agent-card-status ${statusCls}">${statusLabel}</span>
+            </div>
+            <div class="agent-card-role">${agent.role}</div>
+            <div class="agent-card-stats">
+                <span>Tasks: <strong>${taskCount}</strong></span>
+                <span>Cost today: <strong>${todayCost}</strong></span>
+            </div>
+            <div class="agent-card-last">${lastAction}</div>
+        </div>`;
+    }).join('');
+}
+
+/* ============================================
+   v9: COMMAND PALETTE (Cmd+K)
+   ============================================ */
+let cmdkActiveIndex = 0;
+let cmdkResults = [];
+
+function openCommandPalette() {
+    const overlay = document.getElementById('cmdkOverlay');
+    if (!overlay) return;
+    overlay.classList.add('open');
+    const input = document.getElementById('cmdkInput');
+    if (input) {
+        input.value = '';
+        input.focus();
+        renderCommandResults('');
+    }
+}
+
+function closeCommandPalette() {
+    const overlay = document.getElementById('cmdkOverlay');
+    if (overlay) overlay.classList.remove('open');
+}
+
+function buildCommandList() {
+    const commands = [];
+
+    // Navigation
+    commands.push({ icon: '📋', text: 'Go to Work', action: () => switchTab('work'), group: 'Navigate', shortcut: '1' });
+    commands.push({ icon: '📊', text: 'Go to Activity', action: () => switchTab('activity'), group: 'Navigate', shortcut: '2' });
+    commands.push({ icon: '🚀', text: 'Go to Launch Plan', action: () => switchTab('launch'), group: 'Navigate', shortcut: '3' });
+    commands.push({ icon: '📚', text: 'Go to Reference', action: () => switchTab('reference'), group: 'Navigate', shortcut: '4' });
+
+    // Actions
+    commands.push({ icon: '↻', text: 'Refresh Dashboard', action: () => refreshDashboard(), group: 'Actions', shortcut: 'R' });
+    commands.push({ icon: '📝', text: 'Add a Note', action: () => { closeCommandPalette(); openComment('general', 'Quick Note'); }, group: 'Actions' });
+    commands.push({ icon: '?', text: 'Keyboard Shortcuts', action: () => { closeCommandPalette(); document.getElementById('shortcutsOverlay').style.display = 'grid'; }, group: 'Actions', shortcut: '?' });
+
+    // Jasper Tasks (searchable)
+    SANO_DATA.jasperTasks.forEach((section, si) => {
+        section.items.forEach((item, ii) => {
+            if (item.status !== 'done') {
+                commands.push({
+                    icon: '☐', text: `Complete: ${item.text}`,
+                    action: () => { cycleJasperTask(si, ii); renderTodaysFocus(); closeCommandPalette(); showToast('Task updated'); },
+                    group: 'Tasks'
+                });
+            }
+        });
+    });
+
+    // Decisions (searchable)
+    SANO_DATA.decisions.forEach(d => {
+        commands.push({ icon: '📓', text: d.decision, action: () => { switchTab('activity'); closeCommandPalette(); }, group: 'Decisions' });
+    });
+
+    return commands;
+}
+
+function renderCommandResults(query) {
+    const container = document.getElementById('cmdkResults');
+    if (!container) return;
+
+    const allCommands = buildCommandList();
+    const q = query.toLowerCase().trim();
+
+    cmdkResults = q
+        ? allCommands.filter(c => c.text.toLowerCase().includes(q) || c.group.toLowerCase().includes(q))
+        : allCommands.slice(0, 12); // show top 12 when empty
+
+    cmdkActiveIndex = 0;
+
+    if (cmdkResults.length === 0) {
+        container.innerHTML = '<div class="cmdk-empty">No results found</div>';
+        return;
+    }
+
+    // Group results
+    let html = '';
+    let lastGroup = '';
+    cmdkResults.forEach((r, i) => {
+        if (r.group !== lastGroup) {
+            html += `<div class="cmdk-result-group">${r.group}</div>`;
+            lastGroup = r.group;
+        }
+        const shortcut = r.shortcut ? `<span class="cmdk-result-shortcut">${r.shortcut}</span>` : '';
+        html += `<div class="cmdk-result ${i === 0 ? 'active' : ''}" data-idx="${i}"
+                     onclick="executeCmdkResult(${i})"
+                     onmouseenter="setCmdkActive(${i})">
+            <span class="cmdk-result-icon">${r.icon}</span>
+            <span class="cmdk-result-text">${r.text}</span>
+            ${shortcut}
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function setCmdkActive(idx) {
+    cmdkActiveIndex = idx;
+    document.querySelectorAll('.cmdk-result').forEach((el, i) => {
+        el.classList.toggle('active', parseInt(el.dataset.idx) === idx);
+    });
+}
+
+function executeCmdkResult(idx) {
+    const result = cmdkResults[idx];
+    if (result && result.action) {
+        result.action();
+        closeCommandPalette();
+    }
+}
+
+/* ============================================
+   v9: KEYBOARD SHORTCUTS
+   ============================================ */
+function initKeyboardShortcuts() {
+    document.addEventListener('keydown', e => {
+        // Don't capture when typing in input/textarea
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            // Handle Cmd+K even in inputs
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                openCommandPalette();
+            }
+            // Handle Escape in command palette input
+            if (e.key === 'Escape') {
+                closeCommandPalette();
+                document.getElementById('shortcutsOverlay').style.display = 'none';
+            }
+            // Handle arrow keys in command palette
+            if (document.getElementById('cmdkOverlay')?.classList.contains('open')) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setCmdkActive(Math.min(cmdkActiveIndex + 1, cmdkResults.length - 1));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setCmdkActive(Math.max(cmdkActiveIndex - 1, 0));
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    executeCmdkResult(cmdkActiveIndex);
+                }
+            }
+            return;
+        }
+
+        // Cmd+K / Ctrl+K
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            openCommandPalette();
+            return;
+        }
+
+        // Tab shortcuts
+        if (e.key === '1') switchTab('work');
+        if (e.key === '2') switchTab('activity');
+        if (e.key === '3') switchTab('launch');
+        if (e.key === '4') switchTab('reference');
+        if (e.key === 'r' || e.key === 'R') refreshDashboard();
+        if (e.key === '?') document.getElementById('shortcutsOverlay').style.display = 'grid';
+        if (e.key === 'Escape') {
+            closeCommandPalette();
+            document.getElementById('shortcutsOverlay').style.display = 'none';
+        }
+    });
+
+    // Command palette input listener
+    const cmdkInput = document.getElementById('cmdkInput');
+    if (cmdkInput) {
+        cmdkInput.addEventListener('input', e => {
+            renderCommandResults(e.target.value);
+        });
+    }
+}
+
+
 
