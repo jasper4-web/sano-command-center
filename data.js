@@ -1128,9 +1128,9 @@ items: [
         agentDraftsComplete: 6,
         agentDraftsReviewed: 1,
         v2TasksTotal: 34,
-        v2TasksDone: 8,
-        v2TasksInProgress: 3,
-        v2DecisionsLogged: 39,
+        v2TasksDone: 4,
+        v2TasksInProgress: 2,
+        v2DecisionsLogged: 38,
         weekGatesPassedTotal: 14,
         weekGatesTotal: 22,
         // Overnight pipeline health
@@ -1213,7 +1213,7 @@ items: [
 
     // ---- Project Status Summary (for dashboard hero card) ----
     status: {
-        asOf: '2026-04-24T16:00:00-05:00',
+        asOf: '2026-04-24T13:58:50-05:00',
         week: 2,
         weekName: 'Build Product + Legal Foundation',
         daysToLaunch: 38,
@@ -1228,7 +1228,7 @@ items: [
         thisWeekBiggestLoss: '8 days of overnight Builder/Auditor output lost to API exhaustion',
     },
 
-    prioritiesLastUpdated: '2026-04-24T16:00:00-05:00',
+    prioritiesLastUpdated: '2026-04-24T13:58:50-05:00',
 };
 
 // ---- Persistence Layer ----
