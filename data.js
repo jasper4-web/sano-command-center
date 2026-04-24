@@ -198,6 +198,22 @@ const SANO_DATA = {
             { date: 'Apr 9', spent: 0.15, tasks: 3 },
             { date: 'Apr 10', spent: 0.29, tasks: 5 },
             { date: 'Apr 11', spent: 0.56, tasks: 13 },
+            { date: 'Apr 12', spent: 0.22, tasks: 4 },
+            { date: 'Apr 13', spent: 0.35, tasks: 6 },
+            { date: 'Apr 14', spent: 0.28, tasks: 5 },
+            { date: 'Apr 15', spent: 0.12, tasks: 3 },
+            { date: 'Apr 16', spent: 0.04, tasks: 1, note: 'API exhausted mid-day' },
+            { date: 'Apr 17', spent: 0.03, tasks: 1, note: 'Sentinel only' },
+            { date: 'Apr 18', spent: 0.04, tasks: 1, note: 'Sentinel only — Builder/Auditor blocked' },
+            { date: 'Apr 19', spent: 0.03, tasks: 1, note: 'Sentinel only — Builder/Auditor blocked' },
+            { date: 'Apr 20', spent: 0.03, tasks: 1, note: 'Sentinel only — Builder/Auditor blocked' },
+            { date: 'Apr 21', spent: 0.03, tasks: 1, note: 'Sentinel only — Builder/Auditor blocked' },
+            { date: 'Apr 22', spent: 0.03, tasks: 1, note: 'Sentinel only — Builder/Auditor blocked' },
+            { date: 'Apr 23', spent: 0.03, tasks: 1, note: 'Sentinel only — Builder/Auditor blocked' },
+            { date: 'Apr 24', spent: 0.02, tasks: 1, note: 'Quiet overnight — Cowork session drove daytime work' },
+        ],
+        knownBlockers: [
+            { id: 'blk-1', severity: 'high', since: 'Apr 16-17', resolved: false, description: 'Anthropic API credits exhausted on SANO harness account. Overnight Builder + Auditor + Chief of Staff frozen for ~8 days. Sentinel continued (cheap). Morning briefs escalated daily. Needs $25-50 top-up to restart autonomous cycles.', unblocks: ['Overnight content production', 'Automated MSA/legal drafts', 'Auditor quality checks'] },
         ],
     },
 
@@ -239,6 +255,74 @@ const SANO_DATA = {
             message: '📋 D-0039 LOGGED. Trademark conflict on SANO Solutions → renamed to SANO Systems. Texas name availability confirmed clear. Brandon Wayne Holland confirmed as sole member. Single-member Texas LLC structure confirmed.',
             status: 'complete'
         },
+        // ========== GAP PERIOD (Apr 16-23) — reconstructed 2026-04-24 ==========
+        {
+            agent: 'Jasper',
+            time: '12:00 PM — Apr 22',
+            message: '🧾 NORTHWEST REGISTERED AGENT PAID. $125 for Texas RA service through 2027-04-22 (invoice WD6F8BWZ). Unlocks ability to file LLC with privacy-protected address.',
+            status: 'complete'
+        },
+        {
+            agent: 'Sentinel',
+            time: '6:42 AM — Apr 22',
+            message: '✅ EMAIL WARMUP COMPLETE (Day 14/14). Both cold-email accounts (jasper@sanojobs.com, jasper@sanogrowth.com) warmed and ready for outreach. DNS + SPF + MX all verified on both domains.',
+            status: 'complete'
+        },
+        {
+            agent: 'Antigravity',
+            time: 'Apr 21',
+            message: '🎓 TRAINING HUB v4 SHIPPED. 14-day curriculum live at training/v4/index.html. Each day has 8 micro-steps, 8 verify boxes, 5+ quiz questions, concept chain, Make-it-SANO tier table, prereq + live-status grid. Day 14 is a 12-task capstone exam with 85/100 pass gate. Built for Chris kickoff.',
+            status: 'complete'
+        },
+        {
+            agent: 'Antigravity',
+            time: '9:30 PM — Apr 20',
+            message: '📋 D-0034 + D-0035 LOGGED. (D-0034) Brand palette updated — warm vanilla #f5f0e8 replaces #FAFAFA cool white as secondary surface. (D-0035) Content Engine v4 is vertical-agnostic — skills never hardcode a vertical; vertical is a runtime parameter.',
+            status: 'complete'
+        },
+        {
+            agent: 'Antigravity',
+            time: '7:00 PM — Apr 20',
+            message: '📄 CONTENT ENGINE v4 LANDED. SANO-Content-Engine-v4-Brief.md (25KB) + CEO-Resolutions on Phase 0 Delta (20KB) written. 2-pillar architecture: Intelligence Engine (hooks/research) + Image Production (premium stills). Replaces v3 synthetic-video approach. Targets local home-service owners, not homeowners.',
+            status: 'complete'
+        },
+        {
+            agent: 'Builder',
+            time: 'Apr 20',
+            message: '🎨 LAUNCH WEEK 1 CAMPAIGN ASSETS. Generated via fal.ai Nano Banana Pro: 6 stat/quote/identity images + 7-slide review carousel + vertical-agnosticism test report + ghl-schedule.py + review.html + summary.md. First production output of AMOS Orchestrator after skills install.',
+            status: 'complete'
+        },
+        {
+            agent: 'Sentinel',
+            time: 'Apr 18-21',
+            message: '🛡️ QUIET OVERNIGHT CYCLES. Sentinel kept running health checks (~$0.03/night). DNS healthy, warmup progressing Day 10→14, cost ledger operational. Builder/Auditor blocked by API exhaustion — morning briefs flagged daily for 6 days.',
+            status: 'complete'
+        },
+        {
+            agent: 'Chief of Staff',
+            time: 'Apr 18-23',
+            message: '⚠️ BLOCKER ESCALATED DAILY. Anthropic API credits exhausted Apr 16-17, overnight Builder/Auditor pipeline frozen for 7 days. Morning briefs urgently requested credit top-up ($25-50) + GHL SaaS Pro signup ($497). Neither action taken during gap — unblocked Apr 24 via LLC path + bank card plan.',
+            status: 'flagged'
+        },
+        {
+            agent: 'Cowork (Claude)',
+            time: 'Apr 17 evening',
+            message: '📦 AMOS SKILLS INSTALL + MARKETING PIPELINE SPECS. (1) marketingskills (36 skills) + localseoskills (26 skills) installed at .agents/skills/ + 9 custom AMOS skills (orchestrator, intake, staging, content-writer, campaign-builder, seo-auditor, visual-production, pipeline-watchdog, quality-manager). (2) Marketing Pipeline Specs handoff pack — 12 agent briefs + 4 reference libraries (character library, viral patterns, prompt templates, industry playbook) for pipeline-v5 at agent-output/marketing-pipeline-specs/.',
+            status: 'complete'
+        },
+        {
+            agent: 'Cowork (Claude)',
+            time: 'Apr 17 afternoon',
+            message: '📄 AUDIT + PROPOSAL + PLAYBOOK + QUESTIONNAIRE LANDED. AUDIT.md (21KB) — SANO AI Marketing Agent Stack audit. PROPOSAL.md (22KB). SANO-Tactical-Playbook.docx (44KB). SANO-Mentor-Questionnaire.html + .docx deployed for mentor outreach. .staging-amos/ created with vetted packages ready for install.',
+            status: 'complete'
+        },
+        {
+            agent: 'Builder',
+            time: 'Apr 17',
+            message: '🎬 8 VIDEO CLIPS GENERATED. Campaign: reel-always-on-phone (Audience A — Houston trade-business owners). Used Kling v2 Master + v2.5 Turbo via fal.ai MCP. Clips tested persona library against real hook scenarios.',
+            status: 'complete'
+        },
+        // ========== END GAP RECONSTRUCTION ==========
         {
             agent: 'Antigravity',
             time: '2:40 PM — Apr 15',
@@ -550,7 +634,23 @@ items: [
         { text: '🆔 SOSDirect account provisioned (USER ID 1149753797)', date: 'Apr 24' },
         { text: '🔒 Texas name availability confirmed clear for SANO SYSTEMS', date: 'Apr 24' },
         // Apr 22 earlier
+        { text: '🧾 Northwest Registered Agent paid ($125, invoice WD6F8BWZ, through 2027-04-22)', date: 'Apr 22' },
         { text: '✉️ Email warmup complete on 2 accounts (jasper@sanojobs.com, jasper@sanogrowth.com)', date: 'Apr 22' },
+        // Apr 21
+        { text: '🎓 Training Hub v4 shipped — 14-day SANO curriculum (8 micro-steps/day, capstone exam on Day 14)', date: 'Apr 21' },
+        // Apr 20
+        { text: '📄 SANO Content Engine v4 Brief written (25KB) — 2-pillar architecture, vertical-agnostic', date: 'Apr 20' },
+        { text: '📄 CEO Resolutions on Phase 0 Delta (20KB) — 8 conflicts + 6 design decisions resolved', date: 'Apr 20' },
+        { text: '📋 D-0034 logged — brand palette warm vanilla #f5f0e8 replaces cool white', date: 'Apr 20' },
+        { text: '📋 D-0035 logged — Content Engine vertical-agnostic by design', date: 'Apr 20' },
+        { text: '🎨 Launch Week 1 assets produced — 6 stat/quote images, 7-slide carousel, schedule script, summary', date: 'Apr 20' },
+        // Apr 17 — MAJOR workday
+        { text: '🔬 AUDIT.md complete (21KB) — SANO AI Marketing Agent Stack audit + 7 decision questions', date: 'Apr 17' },
+        { text: '📄 PROPOSAL.md (22KB) + SANO-Tactical-Playbook.docx (44KB)', date: 'Apr 17' },
+        { text: '📝 SANO-Mentor-Questionnaire (HTML + docx) deployed — mentor outreach asset', date: 'Apr 17' },
+        { text: '📦 AMOS skills installed: 36 marketingskills + 26 localseoskills + 9 custom orchestrator/library skills at .agents/skills/', date: 'Apr 17' },
+        { text: '📦 Marketing Pipeline Specs v1 — 12 agent briefs + 4 reference libraries written by Cowork for pipeline-v5', date: 'Apr 17' },
+        { text: '🎬 8 video clips for "reel-always-on-phone" campaign — Kling v2 Master + v2.5 Turbo via fal.ai', date: 'Apr 17' },
         // Apr 15
         { text: '4-tier pricing structure finalized', date: 'Apr 5' },
         { text: 'Chris compensation locked (20% setup / 5% recurring)', date: 'Apr 5' },
