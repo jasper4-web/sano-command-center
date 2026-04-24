@@ -2137,12 +2137,16 @@ font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase;
     
     
 
+    
+    
+
     <script>
 /* ============================================
-   SANO COMMAND CENTER — Data Layer v8.0
-   SOURCE OF TRUTH: brain/v2/BOOT.md + TASKS.jsonl
-   Updated: April 15, 2026
+   SANO COMMAND CENTER — Data Layer v9.0
+   SOURCE OF TRUTH: brain/v2/BOOT.md + TASKS.jsonl + brain/STATE_SYNC.md
+   Updated: April 24, 2026
    Architecture: AI-First (75-80% automation)
+   MAJOR D-0039 RENAME: SANO Solutions → SANO Systems LLC (TX filing submitted)
    ============================================ */
 
 const SANO_DATA = {
@@ -2185,12 +2189,16 @@ const SANO_DATA = {
         breakEven: '2 Starter clients ($397 × 2 = $794 > $572 burn)',
         expenses: [
             // Already paid
-            { id: 'exp-1', item: 'LLC Registration — Texas SOS', amount: 300, status: 'paid', week: 0, category: 'legal' },
-            { id: 'exp-2', item: 'Domain (sanosolutions.ai)', amount: 15, status: 'paid', week: 0, category: 'infra' },
+            { id: 'exp-1', item: 'LLC Filing — Texas SOS (SANO Systems LLC, Document #1580642670002)', amount: 308, status: 'paid', week: 0, category: 'legal', note: '$300 filing + $8.10 conv fee. Filed 2026-04-24. Awaiting approval 1-3 biz days.' },
+            { id: 'exp-1b', item: 'Registered Agent — Northwest (Texas, 1-yr through 2027-04-22)', amount: 125, status: 'paid', week: 0, category: 'legal', note: 'Invoice WD6F8BWZ, paid 2026-04-22' },
+            { id: 'exp-2', item: 'Domain (sanosolutions.ai — retired per D-0039)', amount: 15, status: 'paid', week: 0, category: 'infra', note: 'Will not renew; sanosystems.com TBD' },
             { id: 'exp-3', item: 'Cold email domains (4)', amount: 13, status: 'paid', week: 0, category: 'outreach' },
             { id: 'exp-4', item: 'Instantly.ai (Month 1)', amount: 47, status: 'paid', week: 0, category: 'outreach' },
             { id: 'exp-5', item: 'Google Workspace (4 inboxes)', amount: 30, status: 'paid', week: 0, category: 'outreach' },
             { id: 'exp-6', item: 'Agent API costs (testing)', amount: 5, status: 'paid', week: 0, category: 'agents' },
+            // New pending per legal entity path
+            { id: 'exp-6b', item: 'Domain — sanosystems.com (pending purchase)', amount: 15, status: 'pending', week: 0, category: 'infra', note: 'Cloudflare recommended. Unblocks branded email jasper@sanosystems.com.' },
+            { id: 'exp-6c', item: 'Google Workspace — jasper@sanosystems.com (pending)', amount: 7.40, status: 'pending', week: 0, category: 'infra', note: 'After domain purchase' },
 
             // Week 1 — This week
             { id: 'exp-7', item: 'GHL SaaS Pro (Month 1)', amount: 497, status: 'paid', week: 1, category: 'platform' },
@@ -2222,7 +2230,8 @@ const SANO_DATA = {
     techStack: {
         core: [
             { name: 'GoHighLevel SaaS Pro', cost: '$497/mo', role: 'CRM, automations, client sub-accounts, AI chatbot, voice AI, social planner', status: 'active' },
-            { name: 'GHL MCP (Model Context Protocol)', cost: 'Free', role: '215 tools — AI controls GHL directly via API (port 8000, auto-restart)', status: 'active' },
+            { name: 'GHL MCP (Model Context Protocol)', cost: 'Free', role: '269 tools — AI controls GHL directly via API (port 8000, auto-restart)', status: 'active' },
+            { name: 'Northwest Registered Agent', cost: '$125/yr', role: 'TX registered agent + business address + mail scanning (paid 2026-04-22)', status: 'active' },
             { name: 'Instantly.ai', cost: '$47/mo', role: 'Cold email sending + warmup', status: 'active' },
         ],
         free: [
@@ -2236,13 +2245,35 @@ const SANO_DATA = {
             { name: 'UptimeRobot', cost: 'Free', role: 'Website uptime monitoring' },
         ],
         agents: [
-
-{ name: 'OpenClaw (Builder)', cost: '~$0.08/call', role: 'Overnight content, legal, research production' },
+            { name: 'OpenClaw (Builder)', cost: '~$0.08/call', role: 'Overnight content, legal, research production' },
             { name: 'Antigravity (Manager)', cost: 'Included', role: 'Strategy, planning, GHL MCP control' },
             { name: 'Sentinel', cost: '~$0.02/check', role: '24/7 DNS + system health monitoring' },
             { name: 'Chief of Staff', cost: '~$0.05/plan', role: 'Nightly planning + morning briefings' },
             { name: 'Auditor', cost: '~$0.05/review', role: 'QA on all agent outputs (7/10 min bar)' },
+            { name: 'AMOS Orchestrator', cost: 'On-demand', role: 'Multi-pillar marketing content brain (v4)' },
+            { name: 'Content Writer / Campaign Builder / SEO Auditor / Visual Production', cost: 'On-demand', role: 'AMOS library skills (invoked by Orchestrator)' },
+            { name: 'Pipeline Watchdog / Quality Manager', cost: 'On-demand', role: 'AMOS v2 — detects stuck tasks + final 1-10 quality gate' },
         ],
+        mcps: [
+            { name: 'GHL MCP (mastanley13)', tools: 269, status: 'active', note: 'localhost:8000, launchd auto-restart' },
+            { name: 'fal.ai MCP', status: 'active', note: 'Image + video gen (Nano Banana Pro, FLUX, Kling)' },
+            { name: 'HeyGen MCP', status: 'active', note: 'AI avatar video' },
+            { name: 'Canva MCP', status: 'active', note: 'Branded graphics + auto brand kit' },
+            { name: 'Publora MCP', status: 'active', note: 'Cross-platform scheduling (15 free posts/mo)' },
+            { name: 'Firecrawl MCP', status: 'active', note: 'Competitor research + content curation' },
+        ],
+        skills: {
+            installed_total: 102,
+            breakdown: [
+                { group: 'Legacy agents (11)', files: 11, source: 'SANO native' },
+                { group: 'AMOS skills (7 in .agents/skills/ + 2 v2 agents)', files: 9, source: 'SANO native' },
+                { group: 'marketingskills (post-prune)', files: 28, source: 'coreyhaines31' },
+                { group: 'localseoskills (strategy-only)', files: 26, source: 'garrettjsmith' },
+                { group: 'sickn33 curated (NEW 2026-04-24)', files: 30, source: 'sickn33/antigravity-awesome-skills v10.5.0' },
+            ],
+            archived: 8,
+            note: '8 SaaS-irrelevant marketingskills pruned 2026-04-24 (churn-prevention, paywall-*, signup-flow-cro, onboarding-cro, form-cro, popup-cro, page-cro, aso-audit). ~3,350 lines of context noise removed.',
+        },
     },
 
     // ---- Team ----
@@ -2255,24 +2286,30 @@ const SANO_DATA = {
         // VA: ELIMINATED April 11 — $850/mo saved
     },
 
-    // ---- Overnight Report (Morning Dashboard Card) ----
+    // ---- Latest Session Report (Dashboard Card) ----
     overnightReport: {
-        date: '2026-04-15',
+        date: '2026-04-24',
         status: 'complete',
-        tasksTotal: 8,
-        tasksCompleted: 8,
+        sessionType: 'Cowork session — skills install, rename sweep, LLC filing',
+        tasksTotal: 13,
+        tasksCompleted: 13,
         tasksFailed: 0,
         totalCost: 0,
-        startTime: '11:00 AM',
+        startTime: '10:30 AM CT',
         deliverables: [
-            { name: 'v2 Memory Scaffold installed (BOOT + TASKS + DECISIONS + CHANGELOG)', status: 'complete', file: 'brain/v2/BOOT.md' },
-            { name: 'Pricing locked at 4 tiers (D-0017/D-0019)', status: 'complete', file: 'brain/v2/IDENTITY.md' },
-            { name: 'MSA draft reviewed by CEO (5 flags addressed)', status: 'complete', file: 'agent-output/legal/client-service-agreement-draft.md' },
-            { name: 'Chris 1099 Agreement draft complete', status: 'complete', file: 'agent-output/legal/chris-1099-agreement-draft.md' },
-            { name: 'Knowledge Base FAQ (8 articles) drafted', status: 'complete', file: 'agent-output/training/knowledge-base-faq-v1.md' },
-            { name: 'Social Media batch (15 posts + calendar) drafted', status: 'complete', file: 'agent-output/drafts/social-media-batch-v1.md' },
-            { name: 'SMS/Voice cap research + pricing recommendation', status: 'complete', file: 'msa_review.md' },
-            { name: 'Command Center data sync to v2 brain', status: 'complete', file: 'command-center/data.js' },
+            { name: 'sickn33 repo researched + 30 curated skills installed at .agents/skills/sickn33/', status: 'complete', file: '.agents/skills/sickn33/README.md' },
+            { name: '8 SaaS-irrelevant marketingskills archived', status: 'complete', file: '.agents/skills/_archived/marketingskills-saas-pruned-20260423/' },
+            { name: 'STATE_SYNC cross-tool memory contract written', status: 'complete', file: 'brain/STATE_SYNC.md' },
+            { name: 'SANO Skills Master Plan (HTML)', status: 'complete', file: 'SANO-SKILLS-MASTERPLAN.html' },
+            { name: 'Antigravity handoff document', status: 'complete', file: 'ANTIGRAVITY-HANDOFF-2026-04-23.md' },
+            { name: 'D-0039 rename: SANO Solutions → SANO Systems captured in brain', status: 'complete', file: 'brain/v2/IDENTITY.md' },
+            { name: 'LLC filing checklist + interactive HTML', status: 'complete', file: 'LLC-FILING-CHECKLIST.html' },
+            { name: 'SOSDirect account created (USER ID 1149753797)', status: 'complete', file: 'brain/v2/IDENTITY.md' },
+            { name: 'Form 205 Certificate of Formation FILED (Document #1580642670002)', status: 'complete', file: 'TX SOS — awaiting approval' },
+            { name: 'Northwest RA paid + address confirmed', status: 'complete', file: 'Invoice WD6F8BWZ ($125, through 2027-04-22)' },
+            { name: '107-file rename sweep: SANO Solutions → SANO Systems (219 replacements)', status: 'complete', file: 'brain/DAILY_LATEST.md' },
+            { name: 'Command Center source updated + committed (c31d7f1)', status: 'complete', file: 'command-center/index.html' },
+            { name: 'Brain fully hydrated + DAILY_LATEST logged per STATE_SYNC', status: 'complete', file: 'brain/DAILY_LATEST.md' },
         ],
     },
 
@@ -2309,6 +2346,42 @@ const SANO_DATA = {
 
     // ---- Agent Activity Feed ----
     agentReports: [
+        {
+            agent: 'Cowork (Claude)',
+            time: '2:55 PM — Apr 24',
+            message: '📊 COMMAND CENTER UPDATE. Rebuilt data.js to reflect 2026-04-24 state: LLC filed (Doc #1580642670002), Northwest RA paid, 30 sickn33 skills installed, 8 SaaS skills pruned, STATE_SYNC contract live, 107-file rename sweep complete, new legal entity path unblocking GHL/bank/EIN. Version bumped to v9.0.',
+            status: 'complete'
+        },
+        {
+            agent: 'Jasper',
+            time: '2:42 PM — Apr 24',
+            message: '🏛️ LLC FILED. SANO Systems LLC Certificate of Formation submitted to Texas SOS. Session 042426LD4703, Document #1580642670002. ~$308 charged. Awaiting TX approval email 1-3 biz days. When approval lands → EIN + Mercury + GHL all unblock.',
+            status: 'complete'
+        },
+        {
+            agent: 'Cowork (Claude)',
+            time: '1:45 PM — Apr 24',
+            message: '🔁 RENAME SWEEP EXECUTED. 107 files changed, 219 replacements SANO Solutions → SANO Systems. 480 historical records preserved (agent-output, state/plans, archives, backups). Command Center source renamed + pushed commit c31d7f1. Live Cloudflare dashboard now shows SANO Systems.',
+            status: 'complete'
+        },
+        {
+            agent: 'Cowork (Claude)',
+            time: '12:15 PM — Apr 24',
+            message: '🧠 STATE_SYNC CONTRACT DEPLOYED. Cross-tool memory loop diagnosed. New brain/STATE_SYNC.md defines hydration + write-back rules for Antigravity / Cowork / Chrome / Telegram / OpenClaw. D-0038 logged. Every tool now reads 4 files on session start, appends 1-line entry to DAILY_LATEST on meaningful work events.',
+            status: 'complete'
+        },
+        {
+            agent: 'Cowork (Claude)',
+            time: '11:50 AM — Apr 24',
+            message: '📦 30 SICKN33 SKILLS INSTALLED. Curated from 1,422-skill library. Groups: agent-architect (6), documents (7), essentials (4), meta (8), seo-gap (5). 8 SaaS-irrelevant marketingskills archived (~3,350 lines of context noise removed). Registered in sano-harness/config/agents.toml.',
+            status: 'complete'
+        },
+        {
+            agent: 'Cowork (Claude)',
+            time: '11:05 AM — Apr 24',
+            message: '📋 D-0039 LOGGED. Trademark conflict on SANO Solutions → renamed to SANO Systems. Texas name availability confirmed clear. Brandon Wayne Holland confirmed as sole member. Single-member Texas LLC structure confirmed.',
+            status: 'complete'
+        },
         {
             agent: 'Antigravity',
             time: '2:40 PM — Apr 15',
@@ -2357,6 +2430,36 @@ const SANO_DATA = {
     // JASPER'S TO-DO LIST — Only things Jasper must do himself
     // ======================================================
     jasperTasks: [
+        {
+            section: '🔥 TODAY (Apr 24) — What got done',
+            description: 'The legal entity milestone + skills install + rename sweep',
+            items: [
+                { id: 'j-apr24-1', text: 'SOSDirect account created (USER ID 1149753797)', status: 'complete', time: '10 min', day: 'Fri' },
+                { id: 'j-apr24-2', text: 'Name availability searches run ("SANO SYSTEMS" clear)', status: 'complete', time: '5 min', day: 'Fri' },
+                { id: 'j-apr24-3', text: 'Form 205 Certificate of Formation FILED — Document #1580642670002', status: 'complete', time: '30 min', day: 'Fri' },
+                { id: 'j-apr24-4', text: '~$308 paid (TX $300 + $8.10 conv fee)', status: 'complete', time: '—', day: 'Fri' },
+                { id: 'j-apr24-5', text: 'Cowork: 30 curated sickn33 skills installed + 8 SaaS skills pruned', status: 'complete', time: '—', day: 'Fri' },
+                { id: 'j-apr24-6', text: 'Cowork: STATE_SYNC cross-tool memory contract written (D-0038)', status: 'complete', time: '—', day: 'Fri' },
+                { id: 'j-apr24-7', text: 'Cowork: 107-file rename sweep SANO Solutions → SANO Systems', status: 'complete', time: '—', day: 'Fri' },
+                { id: 'j-apr24-8', text: 'Command Center commit c31d7f1 pushed → live on Cloudflare', status: 'complete', time: '5 min', day: 'Fri' },
+            ]
+        },
+        {
+            section: '⏳ Next (Waiting for TX SOS Approval, 1-3 biz days)',
+            description: 'These unblock as soon as the approval email lands',
+            items: [
+                { id: 'j-next-1', text: 'Monitor email for TX SOS approval from noreply@sos.state.tx.us', status: 'not-started', time: '—', day: 'Mon-Wed' },
+                { id: 'j-next-2', text: 'Optional — track status at webservices.sos.state.tx.us/filing-status with Doc #1580642670002', status: 'not-started', time: '1 min', day: 'Mon' },
+                { id: 'j-next-3', text: 'Same-day as approval — EIN via IRS.gov online (free, 15 min)', status: 'not-started', time: '15 min', day: 'TBD' },
+                { id: 'j-next-4', text: 'Same-day as approval — Apply for Mercury business bank (free, 1-3 day approval)', status: 'not-started', time: '30 min', day: 'TBD' },
+                { id: 'j-next-5', text: 'Register for Texas Comptroller WebFile (franchise tax, $0 due)', status: 'not-started', time: '5 min', day: 'TBD' },
+                { id: 'j-next-6', text: 'Buy sanosystems.com on Cloudflare ($15/yr, time-sensitive to secure)', status: 'not-started', time: '10 min', day: 'Today optional' },
+                { id: 'j-next-7', text: 'Sign up Google Workspace for jasper@sanosystems.com ($7.40/mo)', status: 'not-started', time: '15 min', day: 'After domain' },
+                { id: 'j-next-8', text: 'Once Mercury card arrives → subscribe GHL SaaS Pro ($497/mo) — UNBLOCKS SNAPSHOT WORK', status: 'not-started', time: '5 min', day: 'TBD' },
+                { id: 'j-next-9', text: 'Update Northwest RA account name from Sano Solutions → SANO Systems', status: 'not-started', time: '5 min', day: 'After approval' },
+                { id: 'j-next-10', text: 'Set git global user.email to jasper@sanosystems.com (after Google Workspace live)', status: 'not-started', time: '1 min', day: 'After email setup' },
+            ]
+        },
         {
             section: '🔴 This Weekend (Apr 12-13)',
             description: 'GHL signup + tools setup',
@@ -2576,8 +2679,22 @@ items: [
 
     // ---- Already Completed ----
     completed: [
-        { text: 'LLC registered — Texas SOS', date: 'Apr 4' },
-        { text: 'EIN obtained — IRS.gov', date: 'Apr 4' },
+        // Apr 24 — today
+        { text: '🏛️ SANO Systems LLC Certificate of Formation FILED to Texas SOS (Document #1580642670002, $308 paid)', date: 'Apr 24' },
+        { text: '🧾 Northwest Registered Agent paid — Texas RA service through 2027-04-22 (invoice WD6F8BWZ, $125)', date: 'Apr 22' },
+        { text: '📋 D-0039 logged: SANO Solutions → SANO Systems rename (trademark conflict on prior name)', date: 'Apr 24' },
+        { text: '📦 30 curated sickn33 skills installed at .agents/skills/sickn33/ (agent-architect, documents, essentials, meta, seo-gap)', date: 'Apr 24' },
+        { text: '🗑️ 8 SaaS-irrelevant marketingskills archived (~3,350 lines of context noise removed)', date: 'Apr 24' },
+        { text: '🧠 STATE_SYNC cross-tool memory contract written — brain/STATE_SYNC.md (D-0038)', date: 'Apr 24' },
+        { text: '📄 SANO Skills Master Plan + Antigravity handoff docs produced', date: 'Apr 24' },
+        { text: '📄 LLC filing checklist HTML with interactive progress tracker', date: 'Apr 24' },
+        { text: '🔁 107-file rename sweep: SANO Solutions → SANO Systems (219 replacements, historical records preserved)', date: 'Apr 24' },
+        { text: '📊 Command Center source renamed + deployed to Cloudflare (commit c31d7f1)', date: 'Apr 24' },
+        { text: '🆔 SOSDirect account provisioned (USER ID 1149753797)', date: 'Apr 24' },
+        { text: '🔒 Texas name availability confirmed clear for SANO SYSTEMS', date: 'Apr 24' },
+        // Apr 22 earlier
+        { text: '✉️ Email warmup complete on 2 accounts (jasper@sanojobs.com, jasper@sanogrowth.com)', date: 'Apr 22' },
+        // Apr 15
         { text: '4-tier pricing structure finalized', date: 'Apr 5' },
         { text: 'Chris compensation locked (20% setup / 5% recurring)', date: 'Apr 5' },
         { text: 'Pipeline Mode configured', date: 'Apr 5' },
@@ -2645,7 +2762,7 @@ items: [
         {
             week: 1, name: 'FOUNDATION', theme: 'Get the Engine Running',
             dates: 'Apr 12-18', dateStart: '2026-04-12', dateEnd: '2026-04-18',
-            status: 'active',
+            status: 'complete',
             budget: { estimated: 547, actual: 502 },
             estHours: { jasper: '8-10', agent: '6-8' },
             jasperTasks: [
@@ -2692,17 +2809,26 @@ items: [
             ]
         },
         {
-            week: 2, name: 'BUILD THE PRODUCT', theme: 'Build Once, Deploy Forever',
+            week: 2, name: 'BUILD THE PRODUCT + LEGAL FOUNDATION', theme: 'Build Once, Deploy Forever',
             dates: 'Apr 19-25', dateStart: '2026-04-19', dateEnd: '2026-04-25',
-            status: 'locked',
-            budget: { estimated: 750, actual: 0 },
+            status: 'active',
+            budget: { estimated: 1190, actual: 433 },
+            note: 'Rename sprint (D-0039) + LLC filing + skills install consumed Week 2. Snapshot work shifts to Week 3 post TX SOS approval.',
             estHours: { jasper: '10-12', agent: '8-10' },
             jasperTasks: [
-                { id: 'lp-j-2-1', text: 'Purchase best HVAC snapshot ($50-150)', status: 'not-started' },
+                { id: 'lp-j-2-0a', text: 'Trademark search on "SANO Solutions" — conflict found', status: 'done' },
+                { id: 'lp-j-2-0b', text: 'Trademark + TX name cleared for "SANO Systems"', status: 'done' },
+                { id: 'lp-j-2-0c', text: 'Northwest Registered Agent paid ($125)', status: 'done' },
+                { id: 'lp-j-2-0d', text: 'SOSDirect account + Form 205 filed ($308)', status: 'done' },
+                { id: 'lp-j-2-0e', text: 'Wait for TX SOS approval email (1-3 biz days)', status: 'in-progress' },
+                { id: 'lp-j-2-0f', text: 'EIN from IRS — once LLC approved', status: 'blocked' },
+                { id: 'lp-j-2-0g', text: 'Mercury business bank — once EIN issued', status: 'blocked' },
+                { id: 'lp-j-2-0h', text: 'Buy sanosystems.com domain', status: 'not-started' },
+                { id: 'lp-j-2-1', text: 'Purchase best HVAC snapshot ($50-150)', status: 'not-started', note: 'Blocked on GHL SaaS Pro subscription, which is blocked on Mercury card' },
                 { id: 'lp-j-2-2', text: 'Deploy snapshot to sandbox sub-account', status: 'not-started' },
                 { id: 'lp-j-2-3', text: 'Scribe ON → Walk through entire HVAC snapshot', status: 'not-started' },
                 { id: 'lp-j-2-4', text: 'Review agent-drafted legal agreements', status: 'not-started' },
-                { id: 'lp-j-2-5', text: 'Send legal drafts to TX attorney ($300-500)', status: 'not-started' },
+                { id: 'lp-j-2-5', text: 'Send legal drafts to TX attorney ($300-500)', status: 'not-started', note: 'Can go once LLC filed (done) — attorney wants to see LLC name on MSA' },
                 { id: 'lp-j-2-6', text: 'Customize HVAC snapshot: brand test (fake client)', status: 'not-started' },
                 { id: 'lp-j-2-7', text: 'Record kickoff call walkthrough (Scribe running)', status: 'not-started' },
                 { id: 'lp-j-2-8', text: 'Build client onboarding intake form in GHL', status: 'not-started' },
@@ -2718,7 +2844,14 @@ items: [
                 { id: 'lp-a-2-7', text: 'Social media batch week 2 (10 posts)', agent: 'Builder', status: 'not-started' },
             ],
             gate: [
-                { id: 'lp-g-2-1', text: 'HVAC snapshot deployed and tested', passed: false },
+                { id: 'lp-g-2-0a', text: 'Business name legally cleared (trademark + TX availability)', passed: true },
+                { id: 'lp-g-2-0b', text: 'Registered Agent contracted (Northwest, Texas)', passed: true },
+                { id: 'lp-g-2-0c', text: 'LLC Certificate of Formation filed with TX SOS', passed: true },
+                { id: 'lp-g-2-0d', text: 'LLC approval received (stamped Certificate)', passed: false, note: 'Pending TX SOS review 1-3 biz days' },
+                { id: 'lp-g-2-0e', text: 'EIN obtained from IRS', passed: false, note: 'Blocked on LLC approval' },
+                { id: 'lp-g-2-0f', text: 'Business bank account opened', passed: false, note: 'Blocked on EIN' },
+                { id: 'lp-g-2-0g', text: 'Domain sanosystems.com secured', passed: false },
+                { id: 'lp-g-2-1', text: 'HVAC snapshot deployed and tested', passed: false, note: 'Deferred to Week 3 — blocked on GHL Pro activation' },
                 { id: 'lp-g-2-2', text: 'All automations verified firing', passed: false },
                 { id: 'lp-g-2-3', text: 'Onboarding intake form live', passed: false },
                 { id: 'lp-g-2-4', text: 'Welcome email sequence loaded', passed: false },
